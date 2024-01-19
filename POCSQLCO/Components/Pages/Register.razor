@@ -1,6 +1,7 @@
 ﻿@page "/register"
 
 @using POCSQLCO.Models
+@using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Cryptography
@@ -82,9 +83,15 @@
         utilisateur.Nom = nouvelUtilisateur.Nom;
         utilisateur.Prenom = nouvelUtilisateur.Prenom;
         utilisateur.IsAdmin = false;
-        using (SHA256 sha256 = SHA256.Create())
-        {
-        }
+        //création hash mot de passe
+        byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
+        Console.WriteLine($"Salt: {Convert.ToBase64String(salt)}");
+        string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            password: nouvelUtilisateur.Password!,
+            salt: salt,
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 100000,
+            numBytesRequested: 256 / 8));
     }
 
     /*
