@@ -1,0 +1,25 @@
+﻿@page "/counter"
+@using POCSQLCO.Models
+@rendermode InteractiveServer
+
+<PageTitle>Genre</PageTitle>
+
+<h1>ajouter un Genre</h1>
+
+<EditForm Model="@newGenre" OnValidSubmit="SubmitForm">
+
+    <label>Nom</label>
+    <InputText @bind-Value="newGenre.Libelle" />
+
+    <button type="submit">ajouter</button>
+
+</EditForm>
+
+@inject Models.IVaporService VaporService
+@code{
+    public Genre newGenre = new Genre();
+
+    private void SubmitForm(){
+        VaporService.InsertGenre(newGenre);
+    }
+}

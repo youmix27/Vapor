@@ -1,0 +1,40 @@
+﻿@using POCSQLCO.Models
+@inject ISnackbar Snackbar
+@inject Models.IVaporService VaporService
+
+<EditForm Model=@genre OnValidSubmit="Ajouter">
+<DataAnnotationsValidator />
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            Ajouter Genre
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+            <MudTextField @bind-Value="genre.Libelle" For="@(() => genre.Libelle)" Label="Libelle" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Annuler</MudButton>
+        <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit">Ajouter</MudButton>
+    </DialogActions>
+</MudDialog>
+</EditForm>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public Genre genre { get; set; } = new Genre();
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Ajouter()
+    {
+        //In a real world scenario this bool would probably be a service to delete the item from api/database
+        VaporService.InsertGenre(genre);
+        Snackbar.Add("genre ajouté", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(genre.Id));
+    }
+}

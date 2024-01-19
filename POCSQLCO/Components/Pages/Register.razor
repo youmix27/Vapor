@@ -1,0 +1,102 @@
+﻿@page "/register"
+
+@using POCSQLCO.Models
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+@inject Models.IVaporService VaporService
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <EditForm Model=@nouvelUtilisateur OnValidSubmit="RegisterUtilisateur">
+                <MudTextField @bind-Value="nouvelUtilisateur.Pseudo" Label="Pseudo"
+                              Validation="@(new Func<string, string>(PseudoIsntTaken))" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Password" Label="Mot de passe" HelperText="choisissez un mdp fort" InputType="InputType.Password" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Password2" Label="Mot de passe" HelperText="répéter le mot de passe" InputType="InputType.Password" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Nom" Label="Nom" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Prenom" Label="Prenom" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Ville" Label="Ville" />
+                <MudTextField @bind-Value="nouvelUtilisateur.CodePostal" Label="Code Postal" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Adresse" Label="Adresse" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Telephone" Label="Numéro de Téléphone" />
+            </EditForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Créer compte</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" Href="/login">Annuler</MudButton>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    Utilisateur utilisateur = new Utilisateur();
+    NewUtilisateur nouvelUtilisateur = new NewUtilisateur();
+
+    public class NewUtilisateur
+    {
+        [Required]
+        [StringLength(8, ErrorMessage = "Pseudo trop longue. (max char : 20)")]
+        public string Pseudo { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Le mot de passe doit faire 8 char minimum.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password))]
+        public string Password2 { get; set; }
+        [Required]
+        [StringLength(20, ErrorMessage = "Nom trop long (max : 20 char)")]
+        public string Nom { get; set; }
+        [StringLength(20, ErrorMessage = "Prenom trop long (max : 20 char)")]
+        [Required]
+        public string Prenom { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        [StringLength(20, ErrorMessage = "Ville trop longue. (max char : 20)")]
+        public string Ville { get; set; }
+        [Required]
+        [StringLength(100, ErrorMessage = "Adresse trop longue. (max char : 100)")]
+        public string Adresse { get; set; }
+        [Required]
+        [RegularExpression(@"^(?:0[1-9]|[1-8]\d|9[0-8]|2[ABab])\d{3}$", ErrorMessage = "Code postal invaldie")]
+        public string CodePostal { get; set; }
+        [Required]
+        [RegularExpression(@"^01-9{4}$", ErrorMessage = "Numéro de téléphone invaldie")]
+        public string Telephone { get; set; }
+
+    }
+
+    public void RegisterUtilisateur(EditContext context)
+    {
+        utilisateur.Pseudo = nouvelUtilisateur.Pseudo;
+        utilisateur.Adresse = nouvelUtilisateur.Adresse;
+        utilisateur.Telephone = nouvelUtilisateur.Telephone;
+        utilisateur.FiltreCs = true; //par défaut on filtre les contenus explicites, l'utilisateur devra le modifié manuellement dans les paramètres de son compte
+        utilisateur.FiltreGore = true;
+        utilisateur.CodePostal = nouvelUtilisateur.CodePostal;
+        utilisateur.Ville = nouvelUtilisateur.Ville;
+        utilisateur.Nom = nouvelUtilisateur.Nom;
+        utilisateur.Prenom = nouvelUtilisateur.Prenom;
+        utilisateur.IsAdmin = false;
+        using (SHA256 sha256 = SHA256.Create())
+        {
+        }
+    }
+
+    /*
+    * Vérifie si le pseudo entré par l'utilisateur n'est pas déja utilisé
+    */
+    public string PseudoIsntTaken(string pseudo)
+    {
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(pseudo);
+        if( utilisateur != null)
+        {
+            return "Nom d'utilisateur déjà utilisé";
+        }
+        return null;
+    }
+}

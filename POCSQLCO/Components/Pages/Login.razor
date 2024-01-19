@@ -1,0 +1,30 @@
+﻿@page "/login"
+
+@using POCSQLCO.Models
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+
+<MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4">
+            <EditForm Model=@utilisateur OnValidSubmit="LoginUtilisateur">
+                <MudTextField T="string" @bind-Value="utilisateur.Pseudo" Label="Username" />
+                <MudTextField T="string" @bind-Value="utilisateur.HashMdp" Label="Password" HelperText="Choose a strong password"
+                              InputType="InputType.Password" />
+            </EditForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Se Connecter</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" Href="/register">Créer un compte</MudButton>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    Utilisateur utilisateur = new Utilisateur();
+
+    public void LoginUtilisateur(EditContext context)
+    {
+        
+    }
+}
