@@ -38,6 +38,8 @@ public partial class Utilisateur
 
     public bool? IsAdmin { get; set; }
 
+    public string? Salt { get; set; }
+
     public virtual ICollection<Commande> Commandes { get; set; } = new List<Commande>();
 
     public virtual ICollection<Notation> Notations { get; set; } = new List<Notation>();

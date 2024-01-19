@@ -270,6 +270,10 @@ public partial class VaporContext : DbContext
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("pseudo");
+            entity.Property(e => e.Salt)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("salt");
             entity.Property(e => e.Telephone)
                 .HasMaxLength(10)
                 .IsUnicode(false)
