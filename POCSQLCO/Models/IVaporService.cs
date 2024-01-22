@@ -3,7 +3,7 @@
     public interface IVaporService
     {
 
-        Utilisateur FindUtilisateurByPseudo(string pseudo);
+        Utilisateur FindUtilisateurByPseudo(string? pseudo);
 
         IEnumerable<Genre> GetGenres();
         void InsertGenre(Genre genre);

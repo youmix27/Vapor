@@ -1,9 +1,33 @@
-﻿<MudNavMenu>
-    <MudNavLink Href="/" Match="NavLinkMatch.All">Dashboard</MudNavLink>
-    <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix">ajouter genre</MudNavLink>
-    <MudNavGroup Title="Settings" Expanded="true">
-        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-        <MudNavLink Href="/login" Match="NavLinkMatch.Prefix">Se Déconnecter</MudNavLink>
-    </MudNavGroup>
-    <MudNavLink Href="/weather" Match="NavLinkMatch.Prefix">tableau</MudNavLink>
+﻿@inject AuthenticationStateProvider authStateProvider
+@using POCSQLCO.Authentification
+@inject NavigationManager NavManager
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+
+    <AuthorizeView Roles="Administrator">
+        <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix">ajouter genre</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="Administrator, User">
+        <MudNavLink Href="/weather" Match="NavLinkMatch.Prefix">tableau</MudNavLink>
+        <MudNavGroup Title="Settings" Expanded="true">
+            <MudNavLink Href="/compte"  Match="NavLinkMatch.Prefix">Users</MudNavLink>
+            <MudNavLink Match="NavLinkMatch.Prefix" OnClick="Logout">Se Déconnecter</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
+    <AuthorizeView>
+        <NotAuthorized>
+            <MudNavLink Href="/login" Match="NavLinkMatch.Prefix">Se Connecter</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+    
+    
 </MudNavMenu>
+
+@code{
+    private async Task Logout(){
+        var auth = (Auth)authStateProvider;
+        await auth.UpdateAuthentificationState(null);
+        NavManager.NavigateTo("/login");
+    }
+}

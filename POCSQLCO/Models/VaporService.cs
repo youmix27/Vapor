@@ -14,14 +14,7 @@ namespace POCSQLCO.Models
         public Utilisateur FindUtilisateurByPseudo(string pseudo)
         {
 
-            var sequenceQueryResult = _context.Database.SqlQuery<Utilisateur>($"SELECT * FROM Utilisateur WHERE pseudo = {pseudo}").FirstOrDefault();
-
-            Utilisateur utilisateur = new Utilisateur();
-
-            if (sequenceQueryResult != null)
-            {
-                utilisateur = sequenceQueryResult;
-            }
+            Utilisateur utilisateur = _context.Utilisateurs.Where(u => u.Pseudo == pseudo).FirstOrDefault();
 
             return utilisateur;
         }

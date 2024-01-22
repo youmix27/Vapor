@@ -27,10 +27,10 @@ namespace POCSQLCO.Authentification
                 }
                 string Role;
                 if (userSession.IsAdmin)
-                    Role = "admin";
+                    Role = "Administrator";
                 else
                 {
-                    Role = "user";
+                    Role = "User";
                 }
                 var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
@@ -45,7 +45,7 @@ namespace POCSQLCO.Authentification
             }
         }
 
-        public async Task UpdateAuthentification(UserSession userSession)
+        public async Task UpdateAuthentificationState(UserSession userSession)
         {
             ClaimsPrincipal claimsPrincipal;
 

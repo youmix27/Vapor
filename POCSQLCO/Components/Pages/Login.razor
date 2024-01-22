@@ -1,17 +1,24 @@
 ﻿@page "/login"
 
+@using POCSQLCO.Authentification
 @using POCSQLCO.Models
+@using Microsoft.AspNetCore.Components.Authorization;
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@using System.Text
+@inject AuthenticationStateProvider authStateProvider
+@inject IJSRuntime js
+@inject NavigationManager navManager
+@inject ISnackbar Snackbar
+@inject Models.IVaporService VaporService
 
+<EditForm Model=@utilisateur OnValidSubmit="LoginUtilisateur">
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
-            <EditForm Model=@utilisateur OnValidSubmit="LoginUtilisateur">
-                <MudTextField T="string" @bind-Value="utilisateur.Pseudo" Label="Username" />
-                <MudTextField T="string" @bind-Value="utilisateur.HashMdp" Label="Password" HelperText="Choose a strong password"
+                <MudTextField T="string" @bind-Value="utilisateur.Pseudo" For="@(() => utilisateur.Pseudo)" Label="Username" />
+                <MudTextField T="string" @bind-Value="utilisateur.HashMdp" For="@(() => utilisateur.HashMdp)" Label="Password" HelperText="Choose a strong password"
                               InputType="InputType.Password" />
-            </EditForm>
         </MudPaper>
         <MudPaper Class="pa-4 mt-4">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Se Connecter</MudButton>
@@ -19,12 +26,26 @@
         </MudPaper>
     </MudItem>
 </MudGrid>
+</EditForm>
 
 @code {
     Utilisateur utilisateur = new Utilisateur();
 
-    public void LoginUtilisateur(EditContext context)
+
+    private async Task LoginUtilisateur(EditContext context)
     {
-        
+        Utilisateur verifyUtilisateur = VaporService.FindUtilisateurByPseudo(utilisateur.Pseudo);
+        if(verifyUtilisateur == null || !BCrypt.Net.BCrypt.Verify(utilisateur.HashMdp, verifyUtilisateur.HashMdp)){
+            Snackbar.Add("pseudo ou mot de passe invalide", Severity.Error);
+            return;
+        }
+
+        var auth = (Auth)authStateProvider;
+        await auth.UpdateAuthentificationState(new UserSession
+            {
+                UserName = verifyUtilisateur.Pseudo,
+                IsAdmin = (bool) verifyUtilisateur.IsAdmin 
+            });
+            navManager.NavigateTo("/", true);
     }
 }
