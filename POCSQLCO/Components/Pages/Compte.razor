@@ -1,0 +1,66 @@
+﻿@page "/compte"
+@using POCSQLCO.Models
+@using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Cryptography
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject Models.IVaporService VaporService
+@inject NavigationManager NavManager
+
+<PageTitle>Mon Compte</PageTitle>
+
+<EditForm Model=@oldUtilisateur OnValidSubmit="ModifUtilisateur">
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudPaper Class="pa-4">
+                <MudTextField @bind-Value="oldUtilisateur.Pseudo" For="@(() => oldUtilisateur.Pseudo)" Label="Pseudo" />
+                <MudTextField @bind-Value="FakePassword" InputType="InputType.Password" Disabled Label="Pseudo" />
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="ModifierPassword" />
+                 <MudTextField @bind-Value="oldUtilisateur.Email" For="@(() => oldUtilisateur.Email)" Label="Mail" />
+                 <MudTextField @bind-Value="oldUtilisateur.Nom" For="@(() => oldUtilisateur.Nom)" Label="Nom" />
+                 <MudTextField @bind-Value="oldUtilisateur.Prenom" For="@(() => oldUtilisateur.Prenom)" Label="Prenom" />
+                 <MudTextField @bind-Value="oldUtilisateur.Ville" For="@(() => oldUtilisateur.Ville)" Label="Ville" />
+                 <MudTextField @bind-Value="oldUtilisateur.CodePostal" For="@(() => oldUtilisateur.CodePostal)" Label="Code Postal" />
+                 <MudTextField @bind-Value="oldUtilisateur.Adresse" For="@(() => oldUtilisateur.Adresse)" Label="Adresse" />
+                 <MudTextField @bind-Value="oldUtilisateur.Telephone" For="@(() => oldUtilisateur.Telephone)" Label="Numéro de Téléphone" />
+            </MudPaper>
+            <MudPaper Class="pa-4 mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code{
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    Utilisateur oldUtilisateur = new Utilisateur();
+
+    public string FakePassword { get; set; } = "superstrong123";
+
+
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationState;
+        oldUtilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+
+    }
+
+    private async Task ModifUtilisateur(EditContext context)
+    {
+        oldUtilisateur.HashMdp = VaporService.FindUtilisateurHashPassword(oldUtilisateur); //on récupère le mot de passe ou cas ou il ai été modifier afin de ne pas l'override avec l'ancien
+        VaporService.UpdateUtilisateur(oldUtilisateur);
+        Snackbar.Add("Compte modifié avec succès", Severity.Success);
+    }
+
+    async Task ModifierPassword()
+    {
+        var dialog = await DialogService.ShowAsync<EditPassword>("Modifier Mot de Passe");
+        var result = await dialog.Result;
+    }
+
+    
+}

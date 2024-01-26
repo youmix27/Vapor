@@ -13,8 +13,7 @@
 <MudGrid>
     <MudItem xs="12" sm="7">
         <MudPaper Class="pa-4">
-                <MudTextField @bind-Value="nouvelUtilisateur.Pseudo" For="@(() => nouvelUtilisateur.Pseudo)" Label="Pseudo"
-                              Validation="@(new Func<string, string>(PseudoIsntTaken))" />
+                <MudTextField @bind-Value="nouvelUtilisateur.Pseudo" For="@(() => nouvelUtilisateur.Pseudo)" Label="Pseudo" />
                 <MudTextField @bind-Value="nouvelUtilisateur.Password" For="@(() => nouvelUtilisateur.Password)" Label="Mot de passe" HelperText="choisissez un mdp fort" InputType="InputType.Password" />
                 <MudTextField @bind-Value="nouvelUtilisateur.Password2" For="@(() => nouvelUtilisateur.Password2)" Label="Mot de passe" HelperText="répéter le mot de passe" InputType="InputType.Password" />
                 <MudTextField @bind-Value="nouvelUtilisateur.Email" For="@(() => nouvelUtilisateur.Email)" Label="Mail" />
@@ -40,7 +39,7 @@
     public class NewUtilisateur
     {
         [Required]
-        [StringLength(8, ErrorMessage = "Pseudo trop longue. (max char : 20)")]
+        [StringLength(12, ErrorMessage = "Pseudo trop longue. (max char : 12)")]
         public string Pseudo { get; set; }
 
         [Required]
@@ -76,34 +75,30 @@
 
     public void RegisterUtilisateur(EditContext context)
     {
-        utilisateur.Pseudo = nouvelUtilisateur.Pseudo;
-        utilisateur.Email = nouvelUtilisateur.Email;
-        utilisateur.Adresse = nouvelUtilisateur.Adresse;
-        utilisateur.Telephone = nouvelUtilisateur.Telephone;
-        utilisateur.FiltreCs = true; //par défaut on filtre les contenus explicites, l'utilisateur devra le modifié manuellement dans les paramètres de son compte
-        utilisateur.FiltreGore = true;
-        utilisateur.CodePostal = nouvelUtilisateur.CodePostal;
-        utilisateur.Ville = nouvelUtilisateur.Ville;
-        utilisateur.Nom = nouvelUtilisateur.Nom;
-        utilisateur.Prenom = nouvelUtilisateur.Prenom;
-        utilisateur.IsAdmin = false;
-        //création hash mot de passe
-        utilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(nouvelUtilisateur.Password);
-        VaporService.InsertUtilisateur(utilisateur);
-        NavManager.NavigateTo("/login");
-        Snackbar.Add("compte créé", Severity.Success);
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(nouvelUtilisateur.Pseudo);
+        if (utilisateur == null)
+        {
+            utilisateur.Pseudo = nouvelUtilisateur.Pseudo;
+            utilisateur.Email = nouvelUtilisateur.Email;
+            utilisateur.Adresse = nouvelUtilisateur.Adresse;
+            utilisateur.Telephone = nouvelUtilisateur.Telephone;
+            utilisateur.FiltreCs = true; //par défaut on filtre les contenus explicites, l'utilisateur devra le modifié manuellement dans les paramètres de son compte
+            utilisateur.FiltreGore = true;
+            utilisateur.CodePostal = nouvelUtilisateur.CodePostal;
+            utilisateur.Ville = nouvelUtilisateur.Ville;
+            utilisateur.Nom = nouvelUtilisateur.Nom;
+            utilisateur.Prenom = nouvelUtilisateur.Prenom;
+            utilisateur.IsAdmin = false;
+            //création hash mot de passe
+            utilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(nouvelUtilisateur.Password);
+            VaporService.InsertUtilisateur(utilisateur);
+            NavManager.NavigateTo("/login");
+            Snackbar.Add("compte créé", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Pseudo déjà utilisé", Severity.Error);
+        }
     }
 
-    /*
-    * Vérifie si le pseudo entré par l'utilisateur n'est pas déja utilisé
-    */
-    public string PseudoIsntTaken(string pseudo)
-    {
-        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(pseudo);
-        if( utilisateur != null)
-        {
-            return "Nom d'utilisateur déjà utilisé";
-        }
-        return null;
-    }
 }

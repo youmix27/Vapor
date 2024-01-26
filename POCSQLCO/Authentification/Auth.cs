@@ -15,6 +15,13 @@ namespace POCSQLCO.Authentification
             _sessionStorage = sessionStorage;
         }
 
+        public async Task<string> GetUserPseudo()
+        {
+            var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
+            var userSession = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
+            return userSession.UserName;
+        }
+
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try

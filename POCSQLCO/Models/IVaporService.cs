@@ -3,6 +3,7 @@
     public interface IVaporService
     {
 
+        string FindUtilisateurHashPassword(Utilisateur utilisateur);
         Utilisateur FindUtilisateurByPseudo(string? pseudo);
 
         IEnumerable<Genre> GetGenres();

@@ -11,6 +11,11 @@ namespace POCSQLCO.Models
             _context = context;
         }
 
+        public string FindUtilisateurHashPassword(Utilisateur utilisateur)
+        {
+            string password = _context.Utilisateurs.Where(u => u.Id == utilisateur.Id).Select(u => u.HashMdp).SingleOrDefault();
+            return password;
+        }
         public Utilisateur FindUtilisateurByPseudo(string pseudo)
         {
 

@@ -1,6 +1,7 @@
 ﻿@page "/counter"
 @using POCSQLCO.Models
 @rendermode InteractiveServer
+@inject Models.IVaporService VaporService
 
 <PageTitle>Genre</PageTitle>
 
@@ -15,7 +16,7 @@
 
 </EditForm>
 
-@inject Models.IVaporService VaporService
+
 @code{
     public Genre newGenre = new Genre();
 
