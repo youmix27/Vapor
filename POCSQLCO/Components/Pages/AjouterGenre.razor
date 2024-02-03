@@ -1,6 +1,7 @@
 ﻿@using POCSQLCO.Models
 @inject ISnackbar Snackbar
 @inject Models.IVaporService VaporService
+@rendermode InteractiveServer
 
 <EditForm Model=@genre OnValidSubmit="Ajouter">
 <DataAnnotationsValidator />

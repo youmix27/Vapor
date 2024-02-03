@@ -27,11 +27,11 @@ public partial class Utilisateur
     [Required]
     public string? Telephone { get; set; }
 
-    public bool? FiltreGore { get; set; }
+    public bool FiltreGore { get; set; }
 
-    public bool? FiltreCs { get; set; }
+    public bool FiltreCs { get; set; }
 
-    public bool? IsAdmin { get; set; }
+    public bool IsAdmin { get; set; }
 
     public string? Salt { get; set; }
 

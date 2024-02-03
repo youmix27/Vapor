@@ -8,38 +8,41 @@
 @inject IDialogService DialogService
 @inject Models.IVaporService VaporService
 @inject NavigationManager NavManager
+@rendermode InteractiveServer
 
 <PageTitle>Mon Compte</PageTitle>
 
-<EditForm Model=@oldUtilisateur OnValidSubmit="ModifUtilisateur">
-    <MudGrid>
-        <MudItem xs="12" sm="7">
-            <MudPaper Class="pa-4">
-                <MudTextField @bind-Value="oldUtilisateur.Pseudo" For="@(() => oldUtilisateur.Pseudo)" Label="Pseudo" />
-                <MudTextField @bind-Value="FakePassword" InputType="InputType.Password" Disabled Label="Pseudo" />
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="ModifierPassword" />
-                 <MudTextField @bind-Value="oldUtilisateur.Email" For="@(() => oldUtilisateur.Email)" Label="Mail" />
-                 <MudTextField @bind-Value="oldUtilisateur.Nom" For="@(() => oldUtilisateur.Nom)" Label="Nom" />
-                 <MudTextField @bind-Value="oldUtilisateur.Prenom" For="@(() => oldUtilisateur.Prenom)" Label="Prenom" />
-                 <MudTextField @bind-Value="oldUtilisateur.Ville" For="@(() => oldUtilisateur.Ville)" Label="Ville" />
-                 <MudTextField @bind-Value="oldUtilisateur.CodePostal" For="@(() => oldUtilisateur.CodePostal)" Label="Code Postal" />
-                 <MudTextField @bind-Value="oldUtilisateur.Adresse" For="@(() => oldUtilisateur.Adresse)" Label="Adresse" />
-                 <MudTextField @bind-Value="oldUtilisateur.Telephone" For="@(() => oldUtilisateur.Telephone)" Label="Numéro de Téléphone" />
-            </MudPaper>
-            <MudPaper Class="pa-4 mt-4">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-</EditForm>
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <EditForm Model=@oldUtilisateur OnValidSubmit="ModifUtilisateur">
+        <MudGrid>
+            <MudItem xs="12" sm="7">
+                <MudPaper Class="pa-4">
+                    <MudTextField @bind-Value="oldUtilisateur.Pseudo" For="@(() => oldUtilisateur.Pseudo)" Label="Pseudo" />
+                    <MudTextField @bind-Value="oldUtilisateur.Email" For="@(() => oldUtilisateur.Email)" Label="Mail" />
+                    <MudTextField @bind-Value="oldUtilisateur.Nom" For="@(() => oldUtilisateur.Nom)" Label="Nom" />
+                    <MudTextField @bind-Value="oldUtilisateur.Prenom" For="@(() => oldUtilisateur.Prenom)" Label="Prenom" />
+                    <MudTextField @bind-Value="oldUtilisateur.Ville" For="@(() => oldUtilisateur.Ville)" Label="Ville" />
+                    <MudTextField @bind-Value="oldUtilisateur.CodePostal" For="@(() => oldUtilisateur.CodePostal)" Label="Code Postal" />
+                    <MudTextField @bind-Value="oldUtilisateur.Adresse" For="@(() => oldUtilisateur.Adresse)" Label="Adresse" />
+                    <MudTextField @bind-Value="oldUtilisateur.Telephone" For="@(() => oldUtilisateur.Telephone)" Label="Numéro de Téléphone" />
+                    <MudCheckBox @bind-Value="oldUtilisateur.FiltreCs" Label="afficher contenu à caractère sexuel"></MudCheckBox>
+                    <MudCheckBox @bind-Value="oldUtilisateur.FiltreGore" Label="afficher contenu à caractère gore"></MudCheckBox>
+                    </MudPaper>
+                    <MudPaper Class="pa-4 mt-4">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+</MudContainer>
+
+
 
 @code{
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
     Utilisateur oldUtilisateur = new Utilisateur();
-
-    public string FakePassword { get; set; } = "superstrong123";
 
 
     protected override async void OnInitialized()

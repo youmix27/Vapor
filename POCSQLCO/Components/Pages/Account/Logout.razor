@@ -1,0 +1,20 @@
+﻿@page "/Account/Logout"
+@using Microsoft.AspNetCore.Authentication
+@inject NavigationManager navManager
+
+<MudAlert Severity="Severity.Info">Vous avez été déconnecté avec succès.</MudAlert>
+
+@code {
+	[CascadingParameter]
+	public HttpContext HttpContext { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		if (HttpContext.User.Identity.IsAuthenticated)
+		{
+			await HttpContext.SignOutAsync();
+			navManager.NavigateTo("/Account/Logout", true);
+		}
+	}
+}

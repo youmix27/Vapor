@@ -1,0 +1,73 @@
+﻿@page "/Account/Login"
+
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using POCSQLCO.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using POCSQLCO.Models.ViewModels
+@using System.Security.Claims
+@inject NavigationManager navManager
+@inject Models.IVaporService VaporService
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 p-4 pb-4 border">
+        <EditForm Model="@Model" OnValidSubmit="LoginUtilisateur" FormName="LoginForm">
+            <DataAnnotationsValidator />
+                <div class="mb-3 text-center flex-column">
+                    <h3>Se Connecter</h3>
+                </div>
+                <div class="mb-3">
+                    <label>Pseudo</label>
+                    <InputText @bind-Value="Model.Pseudo" class="form-control" />
+                    <ValidationMessage For="() => Model.Pseudo" />
+                </div>
+                <div class="mb-3">
+                    <label>Mot De Passe</label>
+                    <InputText @bind-Value="Model.Password" type="Password" class="form-control" />
+                    <ValidationMessage For="() => Model.Password" />
+                </div>
+                <div class="mb-3 text-center">
+                    <span class="text-danger">@errorMessage</span>
+                </div>
+                <div class="mb-3 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Se Connecter</button>
+                </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] 
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm]
+    public LoginViewModel Model { get; set; } = new LoginViewModel();
+
+    private string? errorMessage;
+
+    private async Task LoginUtilisateur()
+    {
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(Model.Pseudo);
+        if (utilisateur == null || !BCrypt.Net.BCrypt.Verify(Model.Password, utilisateur.HashMdp)) // on vérifie la validité du pseudo et du mot de passe
+        {
+            errorMessage = "mot de passe ou nom d'utilisateur erronés";
+            return;
+        }
+        string Role;
+        if (utilisateur.IsAdmin) // on convertit la valeur bool en un rôle
+            Role = "Administrator";
+        else
+        {
+            Role = "User";
+        }
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, Model.Pseudo),
+            new Claim(ClaimTypes.Role, Role)
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContext.SignInAsync(principal);
+        navManager.NavigateTo("/");
+    }
+}
