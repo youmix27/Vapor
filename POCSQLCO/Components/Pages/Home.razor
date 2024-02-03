@@ -5,16 +5,31 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudCarousel Class="mud-width-full" Style="height:400px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
-    @foreach (Jeu jeu in JeuxCaroussel)
-    {
-        <MudCarouselItem Transition="Transition.Slide">
-            <div class="d-flex" style="height:100%">
-                <MudImage ObjectFit="ObjectFit.Contain" Height="400" Src="@GetJeuSource(jeu.Jaquette)" Alt="Örebro Slott" Elevation="25" Class="rounded-lg" />
-            </div>
-        </MudCarouselItem>
-    }
-</MudCarousel>
+<div class="d-flex justify-center">
+    <MudCarousel Style="height:400px; width:900px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+        @foreach (Jeu jeu in JeuxCaroussel)
+        {
+            <MudCarouselItem Transition="Transition.Slide" >
+                <div class="d-flex justify-center position-relative" style="height:90%; cursor: pointer">
+                    <MudImage ObjectFit="ObjectFit.Contain" Height="350" Src="@GetJeuSource(jeu.Jaquette)" Alt="@jeu.Jaquette" Elevation="25" Class="rounded-lg" />
+                    <MudPaper Elevation="25" Style="position: absolute; bottom: 0; left: auto; width: 85%; background-color: rgba(0, 0, 0, 0.6); padding: 20px; color: ghostwhite;" Class="rounded-lg">
+                        <div class="d-flex justify-space-between align-center">
+                            <MudText Typo="Typo.h4"><b>@jeu.Libelle</b></MudText>
+                            @if (jeu.Prix.HasValue)
+                            {
+                                <MudText Typo="Typo.h6"><b>@jeu.Prix €</b></MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.h6"><b>À VENIR</b></MudText>
+                            }
+                        </div>
+                    </MudPaper>
+                </div>
+            </MudCarouselItem>
+        }
+    </MudCarousel>
+</div>
 
 @code{
     public List<Jeu> JeuxCaroussel { get; set; } = new();

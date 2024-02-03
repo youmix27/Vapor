@@ -15,8 +15,6 @@ public partial class Jeu
 
     public DateOnly? DateDeSortie { get; set; }
 
-    public DateOnly? DateDerniereMaj { get; set; }
-
     public int? DeveloppeurId { get; set; }
 
     public int? DistributeurId { get; set; }

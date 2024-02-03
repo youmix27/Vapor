@@ -132,9 +132,8 @@ public partial class VaporContext : DbContext
             entity.Property(e => e.ContientCs).HasColumnName("contient_CS");
             entity.Property(e => e.ContientGore).HasColumnName("contient_gore");
             entity.Property(e => e.DateDeSortie).HasColumnName("date_de_sortie");
-            entity.Property(e => e.DateDerniereMaj).HasColumnName("date_derniere_maj");
             entity.Property(e => e.Description)
-                .HasMaxLength(255)
+                .HasMaxLength(1000)
                 .IsUnicode(false)
                 .HasColumnName("description");
             entity.Property(e => e.DeveloppeurId).HasColumnName("developpeur_id");

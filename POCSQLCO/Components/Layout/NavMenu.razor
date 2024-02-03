@@ -1,54 +1,35 @@
 ﻿@inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
+@rendermode InteractiveServer
 
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Accueil</MudNavLink>
+    <AuthorizeView Roles="Administrator, User">
+    <MudNavLink Href="/weather" Match="NavLinkMatch.Prefix">Catalogue</MudNavLink>
+    <MudNavGroup Title="@Name" Expanded="true">
+        <MudNavLink Href="/compte" Match="NavLinkMatch.Prefix">Mon Compte</MudNavLink>
+        <MudNavLink Href="/Account/Logout" Match="NavLinkMatch.Prefix">Se Déconnecter</MudNavLink>
+    </MudNavGroup>
+    </AuthorizeView>
+    <AuthorizeView Roles="Administrator">
+        <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix">Utilisateurs</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView>
+        <NotAuthorized>
+            <MudNavLink Href="/Account/Login" Match="NavLinkMatch.Prefix">Se Connecter</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudNavMenu>
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <MudImage Fluid="true" Width="100" Height="100" Src="img/VaporLogoWhite.svg" Alt="Logo blazor" Class="rounded-lg" />
-    </div>
-</div>
+@code{
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    public string Name { get; set; }
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <AuthorizeView Roles="Administrator">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="counter">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-                </NavLink>
-            </div>
-        </AuthorizeView>
-        <AuthorizeView Roles="Administrator, User">
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="weather">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="compte">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Mon Compte
-                </NavLink>
-            </div>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="Account/Logout">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Se Déconnecter
-                </NavLink>
-            </div>
-        </AuthorizeView>
-        <AuthorizeView>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Se Connecter
-                    </NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
-</div>
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationState;
+        Name = authState.User.Identity.Name;
+    }
+}
