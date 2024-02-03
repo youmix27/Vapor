@@ -1,19 +1,32 @@
 ﻿@page "/"
+@using POCSQLCO.Models
+@inject Models.IVaporService VaporService
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        <h1>Hello, @context.User.Identity.Name !</h1>
-    </Authorized>
-    <NotAuthorized>
-        <h1>You should connect you know ?</h1>
-    </NotAuthorized>
-</AuthorizeView>
-
-<h1>BIENVENUE SUR VAPOR</h1>
-
-Welcome to your new app.
+<MudCarousel Class="mud-width-full" Style="height:400px;" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="true" TData="object">
+    @foreach (Jeu jeu in JeuxCaroussel)
+    {
+        <MudCarouselItem Transition="Transition.Slide">
+            <div class="d-flex" style="height:100%">
+                <MudImage ObjectFit="ObjectFit.Contain" Height="400" Src="@GetJeuSource(jeu.Jaquette)" Alt="Örebro Slott" Elevation="25" Class="rounded-lg" />
+            </div>
+        </MudCarouselItem>
+    }
+</MudCarousel>
 
 @code{
+    public List<Jeu> JeuxCaroussel { get; set; } = new();
+
+    protected override async void OnInitialized()
+    {
+        JeuxCaroussel.Add(VaporService.FindJeuByJaquette("gtav"));
+        JeuxCaroussel.Add(VaporService.FindJeuByJaquette("shii"));
+        JeuxCaroussel.Add(VaporService.FindJeuByJaquette("deathloop"));
+    }
+
+    private string GetJeuSource(string jaquette){
+        return "img/jeux/" + jaquette + ".jpg";
+    }
 }

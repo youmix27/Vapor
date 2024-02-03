@@ -3,8 +3,6 @@ using POCSQLCO.Components;
 using POCSQLCO.Models;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using POCSQLCO.Authentification;
 using Microsoft.AspNetCore.Authentication.Cookies;
 //using POCSQLCO.Models;
 

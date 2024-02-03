@@ -2,7 +2,7 @@
 {
     public interface IVaporService
     {
-
+        Jeu FindJeuByJaquette(String jaquette);
         string FindUtilisateurHashPassword(Utilisateur utilisateur);
         Utilisateur FindUtilisateurByPseudo(string? pseudo);
 

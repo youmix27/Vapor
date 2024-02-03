@@ -11,6 +11,16 @@ namespace POCSQLCO.Models
             _context = context;
         }
 
+        #region Jeux
+
+        public Jeu FindJeuByJaquette(String jaquette)
+        {
+            Jeu jeu = _context.Jeux.Where(j => j.Jaquette == jaquette).SingleOrDefault();
+            return jeu;
+        }
+
+        #endregion
+
         public string FindUtilisateurHashPassword(Utilisateur utilisateur)
         {
             string password = _context.Utilisateurs.Where(u => u.Id == utilisateur.Id).Select(u => u.HashMdp).SingleOrDefault();

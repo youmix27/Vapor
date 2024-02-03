@@ -4,8 +4,6 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Cryptography
-@inject ISnackbar Snackbar
-@inject IDialogService DialogService
 @inject Models.IVaporService VaporService
 @inject NavigationManager NavManager
 @rendermode InteractiveServer
@@ -56,13 +54,6 @@
     {
         oldUtilisateur.HashMdp = VaporService.FindUtilisateurHashPassword(oldUtilisateur); //on récupère le mot de passe ou cas ou il ai été modifier afin de ne pas l'override avec l'ancien
         VaporService.UpdateUtilisateur(oldUtilisateur);
-        Snackbar.Add("Compte modifié avec succès", Severity.Success);
-    }
-
-    async Task ModifierPassword()
-    {
-        var dialog = await DialogService.ShowAsync<EditPassword>("Modifier Mot de Passe");
-        var result = await dialog.Result;
     }
 
     
