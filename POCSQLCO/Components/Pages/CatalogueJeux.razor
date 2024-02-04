@@ -1,0 +1,57 @@
+﻿@page "/Catalogue"
+
+@using POCSQLCO.Models
+@rendermode InteractiveServer
+@inject Models.IVaporService VaporService
+@using System.Net.Http.Json
+@inject NavigationManager navManager
+
+<PageTitle>Catalogue Jeux</PageTitle>
+
+<MudDataGrid T="Jeu" Items="@jeux" Filterable="true" FilterMode="@DataGridFilterMode.ColumnFilterRow" FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive" RowClick="@RowClicked" Hover="true" RowClass="cursor-pointer">
+    <Columns>
+        <TemplateColumn CellClass="d-flex" Filterable="false">
+            <CellTemplate>
+                <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@GetJeuSource(context.Item.Jaquette)" Alt="@context.Item.Jaquette" Elevation="25" Class="rounded-lg" />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Libelle" />
+        <PropertyColumn Property="x => x.Prix" Filterable="false" />
+    </Columns>
+</MudDataGrid>
+
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    public IEnumerable<Jeu> jeux { get; set; }
+
+    public string PreviewText { get; set; } = "A VENIR";
+
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationState;
+        if (authState.User.Identity.Name != null)
+        {
+            Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+            jeux = VaporService.FindJeuxWithUtilisateur(utilisateur);
+        }
+        else
+        {
+            jeux = VaporService.FindAllJeux();
+        }
+    }
+
+    private string GetJeuSource(string jaquette)
+    {
+        return "img/jeux/" + jaquette + ".jpg";
+    }
+
+    void RowClicked(DataGridRowClickEventArgs<Jeu> args)
+    {
+        navManager.NavigateTo("/Jeu/" + args.Item.Jaquette);
+    }
+
+}

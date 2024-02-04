@@ -1,4 +1,4 @@
-﻿@page "/register"
+﻿@page "/Account/Register"
 
 @using POCSQLCO.Models
 @using Microsoft.AspNetCore.Cryptography.KeyDerivation;
@@ -26,6 +26,7 @@
                 <MudTextField @bind-Value="nouvelUtilisateur.Telephone" For="@(() => nouvelUtilisateur.Telephone)" Label="Numéro de Téléphone" />
         </MudPaper>
         <MudPaper Class="pa-4 mt-4">
+            <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPseudo">Nom d'utilisateur déjà utilisé par un autre compte'</MudAlert>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Créer compte</MudButton>
             <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" Href="/login">Annuler</MudButton>
         </MudPaper>
@@ -34,8 +35,9 @@
 </EditForm>
 
 @code {
-    Utilisateur utilisateur = new Utilisateur();
-    NewUtilisateur nouvelUtilisateur = new NewUtilisateur();
+    public Utilisateur utilisateur { get; set; }
+    public NewUtilisateur nouvelUtilisateur { get; set; } = new NewUtilisateur();
+    public bool ErrorPseudo { get; set; } = true;
 
     public class NewUtilisateur
     {
@@ -79,6 +81,7 @@
         Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(nouvelUtilisateur.Pseudo);
         if (utilisateur == null)
         {
+            utilisateur = new Utilisateur();
             utilisateur.Pseudo = nouvelUtilisateur.Pseudo;
             utilisateur.Email = nouvelUtilisateur.Email;
             utilisateur.Adresse = nouvelUtilisateur.Adresse;
@@ -93,12 +96,11 @@
             //création hash mot de passe
             utilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(nouvelUtilisateur.Password);
             VaporService.InsertUtilisateur(utilisateur);
-            NavManager.NavigateTo("/login");
-            Snackbar.Add("compte créé", Severity.Success);
+            NavManager.NavigateTo("/Account/Login");
         }
         else
         {
-            Snackbar.Add("Pseudo déjà utilisé", Severity.Error);
+            ErrorPseudo = false;
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿@page "/compte"
+@using Microsoft.AspNetCore.Authorization
 @using POCSQLCO.Models
 @using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 @using System.Text.RegularExpressions
@@ -7,14 +8,16 @@
 @inject Models.IVaporService VaporService
 @inject NavigationManager NavManager
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Administrator, User")]
 
 <PageTitle>Mon Compte</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <EditForm Model=@oldUtilisateur OnValidSubmit="ModifUtilisateur">
-        <MudGrid>
-            <MudItem xs="12" sm="7">
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <EditForm Model=@oldUtilisateur OnValidSubmit="ModifUtilisateur">
                 <MudPaper Class="pa-4">
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4"> Mon compte </MudText>
                     <MudTextField @bind-Value="oldUtilisateur.Pseudo" For="@(() => oldUtilisateur.Pseudo)" Label="Pseudo" />
                     <MudTextField @bind-Value="oldUtilisateur.Email" For="@(() => oldUtilisateur.Email)" Label="Mail" />
                     <MudTextField @bind-Value="oldUtilisateur.Nom" For="@(() => oldUtilisateur.Nom)" Label="Nom" />
@@ -25,13 +28,26 @@
                     <MudTextField @bind-Value="oldUtilisateur.Telephone" For="@(() => oldUtilisateur.Telephone)" Label="Numéro de Téléphone" />
                     <MudCheckBox @bind-Value="oldUtilisateur.FiltreCs" Label="afficher contenu à caractère sexuel"></MudCheckBox>
                     <MudCheckBox @bind-Value="oldUtilisateur.FiltreGore" Label="afficher contenu à caractère gore"></MudCheckBox>
-                    </MudPaper>
-                    <MudPaper Class="pa-4 mt-4">
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
-                    </MudPaper>
-                </MudItem>
-            </MudGrid>
-        </EditForm>
+                </MudPaper>
+                <MudPaper Class="pa-4 mt-4">
+                    <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPseudo">Nom d'utilisateur déjà utilisé par un autre compte'</MudAlert>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
+                </MudPaper>
+            </EditForm>
+            <EditForm Model=@newPassword OnValidSubmit="Modifier">
+                <MudPaper Class="pa-4 mt-4">
+                    <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4"> Modifier Mot de Passe </MudText>
+                    <MudTextField @bind-Value="newPassword.AncienPassword" For="@(() => newPassword.AncienPassword)" InputType="InputType.Password" Label="Ancien Mot de Passe" />
+                    <MudTextField @bind-Value="newPassword.NouveauPassword" For="@(() => newPassword.NouveauPassword)" InputType="InputType.Password" Label="Nouveau Mot de Passe" />
+                    <MudTextField @bind-Value="newPassword.NouveauPassword2" For="@(() => newPassword.NouveauPassword2)" InputType="InputType.Password" Label="Confirmation Nouveau Mot de Passe" />
+                </MudPaper>
+                <MudPaper Class="pa-4 mt-4">
+                    <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPassword">Erreur sur l'ancien mot de passe</MudAlert>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
+                </MudPaper>
+            </EditForm>
+        </MudItem>
+    </MudGrid>
 </MudContainer>
 
 
@@ -40,7 +56,27 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    Utilisateur oldUtilisateur = new Utilisateur();
+    public Utilisateur oldUtilisateur { get; set; } = new Utilisateur();
+
+    public NewPassword newPassword { get; set; } = new NewPassword();
+
+    public bool ErrorPassword { get; set; } = true;
+
+    public bool ErrorPseudo { get; set; } = true;
+
+    public class NewPassword
+    {
+        [Required(ErrorMessage = "Veuillez préciser l'ancien mot de passe")]
+        public string AncienPassword { get; set; }
+
+        [Required(ErrorMessage = "Veuillez préciser le nouveau mot de passe")]
+        [StringLength(30, ErrorMessage = "Le mot de passe doit faire 8 char minimum.", MinimumLength = 8)]
+        public string NouveauPassword { get; set; }
+
+        [Required(ErrorMessage = "Veuillez préciser la confirmation du nouveau mot de passe")]
+        [Compare(nameof(NouveauPassword), ErrorMessage = "les deux mots de passes sont différents")]
+        public string NouveauPassword2 { get; set; }
+    }
 
 
     protected override async void OnInitialized()
@@ -52,8 +88,29 @@
 
     private async Task ModifUtilisateur(EditContext context)
     {
-        oldUtilisateur.HashMdp = VaporService.FindUtilisateurHashPassword(oldUtilisateur); //on récupère le mot de passe ou cas ou il ai été modifier afin de ne pas l'override avec l'ancien
+        Utilisateur utilisateurVerificationPseudoDouble = VaporService.FindUtilisateurByPseudo(oldUtilisateur.Pseudo);
+        var authState = await authenticationState;
+        if (oldUtilisateur.Pseudo != authState.User.Identity.Name && utilisateurVerificationPseudoDouble != null) // si le pseudo a été changé, on vérifit que celui ci ne soit pas utilisé par un autre compte
+        {
+            ErrorPseudo = false;
+            return;
+        }
         VaporService.UpdateUtilisateur(oldUtilisateur);
+    }
+
+    private void Modifier()
+    {
+        if (BCrypt.Net.BCrypt.Verify(newPassword.AncienPassword, oldUtilisateur.HashMdp))
+        {
+            oldUtilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(newPassword.NouveauPassword);
+            VaporService.UpdateUtilisateur(oldUtilisateur);
+            ErrorPassword = true;
+        }
+        else
+        {
+            ErrorPassword = false;
+        }
+
     }
 
     

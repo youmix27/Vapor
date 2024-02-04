@@ -1,12 +1,11 @@
 ﻿@inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
-@rendermode InteractiveServer
 
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All">Accueil</MudNavLink>
+     <MudNavLink Href="/Catalogue" Match="NavLinkMatch.Prefix">Catalogue</MudNavLink>
     <AuthorizeView Roles="Administrator, User">
-    <MudNavLink Href="/weather" Match="NavLinkMatch.Prefix">Catalogue</MudNavLink>
-    <MudNavGroup Title="@Name" Expanded="true">
+        <MudNavGroup Title="@Name" Expanded="true">
         <MudNavLink Href="/compte" Match="NavLinkMatch.Prefix">Mon Compte</MudNavLink>
         <MudNavLink Href="/Account/Logout" Match="NavLinkMatch.Prefix">Se Déconnecter</MudNavLink>
     </MudNavGroup>

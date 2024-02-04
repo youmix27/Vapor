@@ -2,7 +2,9 @@
 @using Microsoft.AspNetCore.Authentication
 @inject NavigationManager navManager
 
-<MudAlert Severity="Severity.Info">Vous avez été déconnecté avec succès.</MudAlert>
+<PageTitle>Déconnexion</PageTitle>
+
+<MudAlert Severity="Severity.Info" Class="mt-4">Vous avez été déconnecté avec succès.</MudAlert>
 
 @code {
 	[CascadingParameter]

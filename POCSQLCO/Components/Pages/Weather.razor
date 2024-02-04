@@ -33,7 +33,7 @@
     private List<string> _events = new();
     protected override void OnInitialized()
     {
-        genres = VaporService.GetGenres();
+        genres = VaporService.FindAllGenres();
     }
     private async Task SubmitForm()
     {
@@ -46,7 +46,7 @@
         var parameters = new DialogParameters<EditGenre> { { x => x.genre, genre } };
         var dialog = await DialogService.ShowAsync<EditGenre>("Modifier genre", parameters);
         var result = await dialog.Result;
-        genres = VaporService.GetGenres();
+        genres = VaporService.FindAllGenres();
     }
 
     async Task SupprimerGenre(Genre genre)
@@ -54,13 +54,13 @@
         var parameters = new DialogParameters<SupprimerGenre> { { x => x.genre, genre } };
         var dialog = await DialogService.ShowAsync<SupprimerGenre>("Supprimer genre", parameters);
         var result = await dialog.Result;
-        genres = VaporService.GetGenres();
+        genres = VaporService.FindAllGenres();
     }
 
     async Task AjouterGenre()
     {
         var dialog = await DialogService.ShowAsync<AjouterGenre>("Ajouter genre");
         var result = await dialog.Result;
-        genres = VaporService.GetGenres();
+        genres = VaporService.FindAllGenres();
     }
 }

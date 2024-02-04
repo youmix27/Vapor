@@ -9,8 +9,10 @@
 @inject NavigationManager navManager
 @inject Models.IVaporService VaporService
 
+<PageTitle>Connection</PageTitle>
+
 <div class="row">
-    <div class="col-lg-4 offset-lg-4 p-4 pb-4 border">
+    <div class="col-lg-4 offset-lg-4 p-4 pb-4 border mt-4">
         <EditForm Model="@Model" OnValidSubmit="LoginUtilisateur" FormName="LoginForm">
             <DataAnnotationsValidator />
                 <div class="mb-3 text-center flex-column">
@@ -31,6 +33,7 @@
                 </div>
                 <div class="mb-3 d-grid gap-2">
                     <button type="submit" class="btn btn-primary">Se Connecter</button>
+                    <a href="/Account/Register" class="btn btn-secondary">Créer un compte</a>
                 </div>
         </EditForm>
     </div>
@@ -53,13 +56,7 @@
             errorMessage = "mot de passe ou nom d'utilisateur erronés";
             return;
         }
-        string Role;
-        if (utilisateur.IsAdmin) // on convertit la valeur bool en un rôle
-            Role = "Administrator";
-        else
-        {
-            Role = "User";
-        }
+        string Role = utilisateur.IsAdmin ? "Administrator" : "User";
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, Model.Pseudo),

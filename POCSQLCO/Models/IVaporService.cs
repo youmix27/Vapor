@@ -2,63 +2,65 @@
 {
     public interface IVaporService
     {
+
+        IEnumerable<Jeu> FindJeuxWithUtilisateur(Utilisateur utilisateur);
         Jeu FindJeuByJaquette(String jaquette);
         string FindUtilisateurHashPassword(Utilisateur utilisateur);
         Utilisateur FindUtilisateurByPseudo(string? pseudo);
 
-        IEnumerable<Genre> GetGenres();
+        IEnumerable<Genre> FindAllGenres();
         void InsertGenre(Genre genre);
         void UpdateGenre(Genre genre);
         void DeleteGenre(Genre genre);
-        Genre? GetGenreById(int id);
+        Genre? FindGenreById(int id);
 
-        IEnumerable<Commande> GetCommandes();
+        IEnumerable<Commande> FindAllCommandes();
         void InsertCommande(Commande commande);
         void UpdateCommande(Commande commande);
         void DeleteCommande(Commande commande);
-        Commande? GetCommandeById(int id, int utilisateurId);
+        Commande? FindCommandeById(int id, int utilisateurId);
 
-        IEnumerable<Theme> GetThemes();
+        IEnumerable<Theme> FindAllThemes();
         void InsertTheme(Theme theme);
         void UpdateTheme(Theme theme);
         void DeleteTheme(Theme theme);
-        Theme? GetThemeById(int id);
+        Theme? FindThemeById(int id);
 
-        IEnumerable<ContenuCommande> GetContenuCommandes();
+        IEnumerable<ContenuCommande> FindAllContenuCommandes();
         void InsertContenuCommande(ContenuCommande contenuCommande);
         void UpdateContenuCommande(ContenuCommande contenuCommande);
         void DeleteContenuCommande(ContenuCommande contenuCommande);
-        ContenuCommande? GetContenuCommandeById(int jeuId, int commandeId);
+        ContenuCommande? FindContenuCommandeById(int jeuId, int commandeId);
 
-        IEnumerable<Developpeur> GetDeveloppeurs();
+        IEnumerable<Developpeur> FindAllDeveloppeurs();
         void InsertDeveloppeur(Developpeur developpeur);
         void UpdateDeveloppeur(Developpeur developpeur);
         void DeleteDeveloppeur(Developpeur developpeur);
-        Developpeur? GetDeveloppeurById(int id);
+        Developpeur? FindtDeveloppeurById(int id);
 
-        IEnumerable<Distributeur> GetDistributeurs();
+        IEnumerable<Distributeur> FindAllDistributeurs();
         void InsertDistributeur(Distributeur distributeur);
         void UpdateDistributeur(Distributeur distributeur);
         void DeleteDistributeur(Distributeur distributeur);
-        Distributeur? GetDistributeurById(int id);
+        Distributeur? FindDistributeurById(int id);
 
-        IEnumerable<Jeu> GetJeux();
+        IEnumerable<Jeu> FindAllJeux();
         void InsertJeu(Jeu jeu);
         void UpdateJeu(Jeu jeu);
         void DeleteJeu(Jeu jeu);
-        Jeu? GetJeuById(int id);
+        Jeu? FindJeuById(int id);
 
-        IEnumerable<Notation> GetNotations();
+        IEnumerable<Notation> FindAllNotations();
         void InsertNotation(Notation notation);
         void UpdateNotation(Notation notation);
         void DeleteNotation(Notation notation);
-        Notation? GetNotationById(int utilisateurId, int jeuId);
+        Notation? FindNotationById(int utilisateurId, int jeuId);
 
-        IEnumerable<Utilisateur> GetUtilisateurs();
+        IEnumerable<Utilisateur> FindAllUtilisateurs();
         void InsertUtilisateur(Utilisateur utilisateur);
         void UpdateUtilisateur(Utilisateur utilisateur);
         void DeleteUtilisateur(Utilisateur utilisateur);
-        Utilisateur? GetUtilisateurById(int id);
+        Utilisateur? FindUtilisateurById(int id);
 
     }
 }

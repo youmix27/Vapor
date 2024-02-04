@@ -1,0 +1,26 @@
+﻿@page "/Jeu/{jacquette}"
+@using POCSQLCO.Models
+@inject Models.IVaporService VaporService
+@inject NavigationManager navManager
+
+<PageTitle>@Jeu.Libelle</PageTitle>
+
+<h1>page du jeu @Jeu.Libelle !</h1>
+
+@code {
+
+	[Parameter]
+	public string Jacquette { get; set; }
+
+	public Jeu? Jeu { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		Jeu = VaporService.FindJeuByJaquette(Jacquette);
+		if(Jeu == null)
+		{
+			navManager.NavigateTo("/", true);
+		}
+	}
+
+}
