@@ -47,6 +47,7 @@ public partial class VaporContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.UtilisateurId).HasColumnName("utilisateur_id");
             entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.EstTermine).HasColumnName("estTermine");
 
             entity.HasOne(d => d.Utilisateur).WithMany(p => p.Commandes)
                 .HasForeignKey(d => d.UtilisateurId)
@@ -56,7 +57,7 @@ public partial class VaporContext : DbContext
 
         modelBuilder.Entity<ContenuCommande>(entity =>
         {
-            entity.HasKey(e => new { e.CommandeId, e.JeuId });
+            entity.HasKey(e => new { e.UtilisateurId, e.CommandeId, e.JeuId });
 
             entity.ToTable("ContenuCommande");
 

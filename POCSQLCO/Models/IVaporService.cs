@@ -2,7 +2,8 @@
 {
     public interface IVaporService
     {
-
+        ContenuCommande? FindContenuCommandeByUtilisateurAndJeu(int jeuId, int utilisateurId);
+        Commande? FindCommandeNonTermineByUtilisateur(Utilisateur utilisateur);
         IEnumerable<Jeu> FindJeuxWithUtilisateur(Utilisateur utilisateur);
         Jeu FindJeuByJaquette(String jaquette);
         string FindUtilisateurHashPassword(Utilisateur utilisateur);
@@ -30,7 +31,7 @@
         void InsertContenuCommande(ContenuCommande contenuCommande);
         void UpdateContenuCommande(ContenuCommande contenuCommande);
         void DeleteContenuCommande(ContenuCommande contenuCommande);
-        ContenuCommande? FindContenuCommandeById(int jeuId, int commandeId);
+        ContenuCommande? FindContenuCommandeById(int jeuId, int commandeId, int utilisateurId);
 
         IEnumerable<Developpeur> FindAllDeveloppeurs();
         void InsertDeveloppeur(Developpeur developpeur);

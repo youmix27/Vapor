@@ -2,25 +2,72 @@
 @using POCSQLCO.Models
 @inject Models.IVaporService VaporService
 @inject NavigationManager navManager
+@rendermode InteractiveServer
 
 <PageTitle>@Jeu.Libelle</PageTitle>
 
-<h1>page du jeu @Jeu.Libelle !</h1>
+    <div Class="d-flex justify-center">
+    <MudPaper Width="80%" Class="">
+        <MudContainer Class="mt-4" Fixed = "true">
+            <MudGrid Justify="Justify.Center" >
+                
+                    <MudItem xs="12" sm="8" md="6">
+                            <MudText Align="Align.Center" Variant="Variant.H4">@Jeu.Libelle</MudText>
+                            <MudImage ObjectFit="ObjectFit.Contain"  Src="@GetJeuSource(Jeu.Jaquette)" Alt="@Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
+                            <MudText Align="Align.Center">@Jeu.Description</MudText>
+                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" @onclick="() => AjouterAuPanier(Jeu)">Ajouter au panier</MudButton>
+                    </MudItem>
+                
+            </MudGrid>
+        </MudContainer>
+    </MudPaper>
+    </div>
 
-@code {
 
-	[Parameter]
-	public string Jacquette { get; set; }
+    @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+    [Parameter]
+    public string Jacquette { get; set; }
 
-	public Jeu? Jeu { get; set; }
+    public Jeu? Jeu { get; set; }
 
-	protected override async Task OnInitializedAsync()
-	{
-		Jeu = VaporService.FindJeuByJaquette(Jacquette);
-		if(Jeu == null)
-		{
-			navManager.NavigateTo("/", true);
-		}
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        Jeu = VaporService.FindJeuByJaquette(Jacquette);
+        if(Jeu == null)
+        {
+            navManager.NavigateTo("/", true);
+        }
+    }
+
+    private string GetJeuSource(string jaquette)
+    {
+        return "img/jeux/" + jaquette + ".jpg";
+    }
+
+    private async void AjouterAuPanier(Jeu jeu)
+    {
+        var authState = await authenticationState;
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+        Commande? panier = VaporService.FindCommandeNonTermineByUtilisateur(utilisateur);
+        if(panier == null) // cas ou le client n'a pas encore d'élément dans son panier
+        {
+            panier = new Commande();
+            panier.UtilisateurId = utilisateur.Id;
+            panier.EstTermine = false;
+            VaporService.InsertCommande(panier);
+        }
+        ContenuCommande? contenuCommande = VaporService.FindContenuCommandeByUtilisateurAndJeu(jeu.Id, panier.UtilisateurId);
+        if(contenuCommande != null) // on n'interdit au client de commander deux fois un même jeu
+        {
+            return;
+        }
+        contenuCommande = new ContenuCommande();
+        contenuCommande.CommandeId = panier.Id;
+        contenuCommande.UtilisateurId = panier.UtilisateurId;
+        contenuCommande.JeuId = jeu.Id;
+        VaporService.InsertContenuCommande(contenuCommande);
+    }
 
 }

@@ -214,6 +214,18 @@ namespace POCSQLCO.Models
 
         #region Commande
 
+        public Commande? FindCommandeNonTermineByUtilisateur(Utilisateur utilisateur)
+        {
+            try
+            {
+                return _context.Commandes.Include(c => c.ContenuCommandes).Where(c => c.EstTermine == false).Where(c => c.UtilisateurId == utilisateur.Id).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public void DeleteCommande(Commande commande)
         {
             try
@@ -288,6 +300,30 @@ namespace POCSQLCO.Models
 
         #region ContenuCommande
 
+        public IEnumerable<ContenuCommande> FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(Utilisateur utilisateur)
+        {
+            try
+            {
+                return _context.ContenuCommandes.Include(cc => cc.Jeu).Include(cc => cc.Commande).Where(cc => cc.UtilisateurId == utilisateur.Id).Where(cc => cc.Commande.EstTermine == false);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public ContenuCommande? FindContenuCommandeByUtilisateurAndJeu(int jeuId, int utilisateurId)
+        {
+            try
+            {
+                return _context.ContenuCommandes.Where(cc => cc.UtilisateurId == utilisateurId).Where(cc => cc.JeuId == jeuId).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public void DeleteContenuCommande(ContenuCommande contenuCommande)
         {
             try
@@ -301,11 +337,11 @@ namespace POCSQLCO.Models
             }
         }
 
-        public ContenuCommande? FindContenuCommandeById(int jeuId, int commandeId)
+        public ContenuCommande? FindContenuCommandeById(int jeuId, int commandeId, int utilisateurId)
         {
             try
             {
-                return _context.ContenuCommandes.Find(commandeId, jeuId);
+                return _context.ContenuCommandes.Find(utilisateurId, commandeId, jeuId);
             }
             catch
             {

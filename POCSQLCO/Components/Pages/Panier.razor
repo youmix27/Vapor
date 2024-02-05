@@ -1,0 +1,16 @@
+﻿@page "/panier"
+@using POCSQLCO.Models
+@inject Models.IVaporService VaporService
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    public List<ContenuCommande> contenuPanier { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        contenuPanier = VaporService.conte
+    }
+}

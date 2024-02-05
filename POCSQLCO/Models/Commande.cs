@@ -14,6 +14,8 @@ public partial class Commande
 
     public DateOnly? Date { get; set; }
 
+    public bool? EstTermine { get; set; }
+
     public virtual ICollection<ContenuCommande> ContenuCommandes { get; set; } = new List<ContenuCommande>();
 
     public virtual Utilisateur Utilisateur { get; set; } = null!;
