@@ -1,16 +1,65 @@
 ﻿@page "/panier"
 @using POCSQLCO.Models
 @inject Models.IVaporService VaporService
+@inject NavigationManager navManager
+@rendermode InteractiveServer
+
+
+<PageTitle>Mon Panier</PageTitle>
+
+@if (Commande != null)
+{
+<MudDataGrid T="ContenuCommande" Items="@ContenuPanier">
+    <Columns>
+        <TemplateColumn CellClass="d-flex">
+            <CellTemplate>
+                <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@GetJeuSource(context.Item.Jeu.Jaquette)" Alt="@context.Item.Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Jeu.Libelle" />
+        <TemplateColumn CellClass="d-flex">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"  @onclick="() => SupprimerJeuDuPanier(context.Item)"></MudIconButton>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+    <MudButton aria-label="valider le panier" Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ValiderPanier()"></MudButton>
+}else{
+    <MudAlert Severity="Severity.Info" Class="mt-4">Vous n'avez actuellement pas de panier.</MudAlert>
+}
 
 @code {
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public List<ContenuCommande> contenuPanier { get; set; }
+    public Commande? Commande { get; set; }
+
+    public IEnumerable<ContenuCommande> ContenuPanier { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        contenuPanier = VaporService.conte
+        var authState = await authenticationState;
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+        Commande = VaporService.FindCommandeNonTermineByUtilisateur(utilisateur);
+        ContenuPanier = VaporService.FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(utilisateur);
+    }
+
+    private string GetJeuSource(string jaquette)
+    {
+        return "img/jeux/" + jaquette + ".jpg";
+    }
+
+    protected async void SupprimerJeuDuPanier(ContenuCommande Produit)
+    {
+        VaporService.DeleteContenuCommande(Produit);
+    }
+
+    protected async void ValiderPanier()
+    {
+        Commande.EstTermine = true;
+        VaporService.UpdateCommande(Commande);
+        navManager.NavigateTo("/Merci_De_Votre_Achat");
     }
 }

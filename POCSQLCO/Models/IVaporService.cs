@@ -2,6 +2,7 @@
 {
     public interface IVaporService
     {
+        IEnumerable<ContenuCommande> FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(Utilisateur utilisateur);
         ContenuCommande? FindContenuCommandeByUtilisateurAndJeu(int jeuId, int utilisateurId);
         Commande? FindCommandeNonTermineByUtilisateur(Utilisateur utilisateur);
         IEnumerable<Jeu> FindJeuxWithUtilisateur(Utilisateur utilisateur);
