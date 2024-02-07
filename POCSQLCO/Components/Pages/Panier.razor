@@ -1,30 +1,34 @@
 ﻿@page "/panier"
 @using POCSQLCO.Models
+@using Microsoft.AspNetCore.Authorization
 @inject Models.IVaporService VaporService
 @inject NavigationManager navManager
+@attribute [Authorize(Roles = "Administrator, User")]
 @rendermode InteractiveServer
 
 
 <PageTitle>Mon Panier</PageTitle>
 
-@if (Commande != null)
+@if (ContenuPanier.Count() != 0)
 {
 <MudDataGrid T="ContenuCommande" Items="@ContenuPanier">
     <Columns>
-        <TemplateColumn CellClass="d-flex">
+        <TemplateColumn>
             <CellTemplate>
                 <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@GetJeuSource(context.Item.Jeu.Jaquette)" Alt="@context.Item.Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Jeu.Libelle" />
-        <TemplateColumn CellClass="d-flex">
+        <PropertyColumn Property="x => x.Jeu.Prix" />
+        <TemplateColumn >
             <CellTemplate>
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"  @onclick="() => SupprimerJeuDuPanier(context.Item)"></MudIconButton>
             </CellTemplate>
         </TemplateColumn>
     </Columns>
 </MudDataGrid>
-    <MudButton aria-label="valider le panier" Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ValiderPanier()"></MudButton>
+    <MudText Typo="Typo.h6">Totale : <b>@PrixTotale</b></MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ValiderPanier()">valider le panier</MudButton>
 }else{
     <MudAlert Severity="Severity.Info" Class="mt-4">Vous n'avez actuellement pas de panier.</MudAlert>
 }
@@ -38,12 +42,18 @@
 
     public IEnumerable<ContenuCommande> ContenuPanier { get; set; }
 
+    public decimal PrixTotale { get; set; } = 0;
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationState;
         Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
         Commande = VaporService.FindCommandeNonTermineByUtilisateur(utilisateur);
         ContenuPanier = VaporService.FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(utilisateur);
+        foreach(ContenuCommande jeuPanier in ContenuPanier)
+        {
+            PrixTotale += (decimal)jeuPanier.Jeu.Prix;
+        }
     }
 
     private string GetJeuSource(string jaquette)
@@ -51,14 +61,15 @@
         return "img/jeux/" + jaquette + ".jpg";
     }
 
-    protected async void SupprimerJeuDuPanier(ContenuCommande Produit)
+    protected void SupprimerJeuDuPanier(ContenuCommande Produit)
     {
         VaporService.DeleteContenuCommande(Produit);
     }
 
-    protected async void ValiderPanier()
+    protected void ValiderPanier()
     {
         Commande.EstTermine = true;
+        Commande.Date = DateOnly.FromDateTime(DateTime.Now);
         VaporService.UpdateCommande(Commande);
         navManager.NavigateTo("/Merci_De_Votre_Achat");
     }

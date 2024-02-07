@@ -35,7 +35,7 @@
     {
         genres = VaporService.FindAllGenres();
     }
-    private async Task SubmitForm()
+    private void SubmitForm()
     {
         VaporService.UpdateGenre(genres.ElementAt(i));
     }

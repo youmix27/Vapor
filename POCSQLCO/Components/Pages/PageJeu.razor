@@ -12,10 +12,25 @@
             <MudGrid Justify="Justify.Center" >
                 
                     <MudItem xs="12" sm="8" md="6">
-                            <MudText Align="Align.Center" Variant="Variant.H4">@Jeu.Libelle</MudText>
-                            <MudImage ObjectFit="ObjectFit.Contain"  Src="@GetJeuSource(Jeu.Jaquette)" Alt="@Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
-                            <MudText Align="Align.Center">@Jeu.Description</MudText>
-                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" @onclick="() => AjouterAuPanier(Jeu)">Ajouter au panier</MudButton>
+                        <MudText Align="Align.Center" Variant="Variant.H4">@Jeu.Libelle</MudText>
+                        <MudImage ObjectFit="ObjectFit.Contain"  Src="@GetJeuSource(Jeu.Jaquette)" Alt="@Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
+                        <MudText Align="Align.Center">@Jeu.Description</MudText>
+                        @switch (ExcpetionAchatJeu)
+                    {
+                        case "aucune":
+                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" @onclick="() => AjouterAuPanier()">Ajouter au panier</MudButton>
+                            break;
+                        case "auPanier":
+                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Href="/panier">Jeu dans le panier</MudButton>
+                            break;
+                        case "nonSortie":
+                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Disabled>Sortie prochaine</MudButton>
+                            break;
+                        case "nonConnecte":
+                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Href="/Account/Login">Veuillez vous connecter</MudButton>
+                            break;
+                    }
+                    
                     </MudItem>
                 
             </MudGrid>
@@ -24,20 +39,43 @@
     </div>
 
 
-    @code {
+@code {
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
     [Parameter]
     public string Jacquette { get; set; }
 
+    public string ExcpetionAchatJeu { get; set; } = "aucune";
+
     public Jeu? Jeu { get; set; }
+
+    public Commande? Panier { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Jeu = VaporService.FindJeuByJaquette(Jacquette);
-        if(Jeu == null)
+        if(Jeu == null) // cas ou le jeu n'existe pas
         {
             navManager.NavigateTo("/", true);
+        }
+        var authState = await authenticationState;
+        Utilisateur? utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+        if (utilisateur != null) // cas utilisateur connecté
+        {
+            Panier = VaporService.FindCommandeNonTermineByUtilisateur(utilisateur);
+            ContenuCommande? contenuCommande = VaporService.FindContenuCommandesByUtilisateurAndJeuAndCommandeNonTerminee(utilisateur, Jeu);
+            if (contenuCommande != null) // on interdit au client de commander deux fois un même jeu
+            {
+                ExcpetionAchatJeu = "auPanier";
+            }
+            if (Jeu.Prix == null) // cas jeu non sortie
+            {
+                ExcpetionAchatJeu = "nonSortie";
+            }
+        }
+        else // cas utilisateur non connecté
+        {
+            ExcpetionAchatJeu = "nonConnecte";
         }
     }
 
@@ -46,28 +84,23 @@
         return "img/jeux/" + jaquette + ".jpg";
     }
 
-    private async void AjouterAuPanier(Jeu jeu)
+    private async void AjouterAuPanier()
     {
         var authState = await authenticationState;
         Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
-        Commande? panier = VaporService.FindCommandeNonTermineByUtilisateur(utilisateur);
-        if(panier == null) // cas ou le client n'a pas encore d'élément dans son panier
+        if (Panier == null) // cas ou le client n'a pas encore d'élément dans son panier
         {
-            panier = new Commande();
-            panier.UtilisateurId = utilisateur.Id;
-            panier.EstTermine = false;
-            VaporService.InsertCommande(panier);
+            Panier = new Commande();
+            Panier.UtilisateurId = utilisateur.Id;
+            Panier.EstTermine = false;
+            VaporService.InsertCommande(Panier);
         }
-        ContenuCommande? contenuCommande = VaporService.FindContenuCommandeByUtilisateurAndJeu(jeu.Id, panier.UtilisateurId);
-        if(contenuCommande != null) // on n'interdit au client de commander deux fois un même jeu
-        {
-            return;
-        }
-        contenuCommande = new ContenuCommande();
-        contenuCommande.CommandeId = panier.Id;
-        contenuCommande.UtilisateurId = panier.UtilisateurId;
-        contenuCommande.JeuId = jeu.Id;
+        ContenuCommande contenuCommande = new ContenuCommande();
+        contenuCommande.CommandeId = Panier.Id;
+        contenuCommande.UtilisateurId = Panier.UtilisateurId;
+        contenuCommande.JeuId = Jeu.Id;
         VaporService.InsertContenuCommande(contenuCommande);
+        navManager.NavigateTo("/Jeu/" + Jeu.Jaquette, true);
     }
 
 }

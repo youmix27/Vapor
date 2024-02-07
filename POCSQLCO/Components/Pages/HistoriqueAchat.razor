@@ -1,0 +1,52 @@
+﻿@page "/historique_achat"
+@using POCSQLCO.Models
+@using Microsoft.AspNetCore.Authorization
+@inject Models.IVaporService VaporService
+@inject NavigationManager navManager
+@attribute [Authorize(Roles = "Administrator, User")]
+@rendermode InteractiveServer
+
+
+<PageTitle>Historique Achat</PageTitle>
+
+@foreach(Commande commande in Commandes)
+{
+    <MudContainer Class="justify-center">
+        <MudPaper Class="ribbon mt-4" Width="90%">
+            <MudText Class="order-number" Typo="Typo.h6">Commande n° @commande.Id</MudText>
+                <MudText Class="order-date" Typo="Typo.body1">Réalisée le @commande.Date.ToString()</MudText>
+                <MudList Class="order-items" Dense="true">
+                    @foreach (ContenuCommande contenuCommande in commande.ContenuCommandes)
+                {
+                    <MudListItem>- @contenuCommande.Jeu.Libelle - @contenuCommande.Jeu.Prix €</MudListItem>
+                }
+                <MudListItem>   Totale : @GetTotalPrice(commande.ContenuCommandes) €</MudListItem>
+            </MudList>
+        </MudPaper>
+    </MudContainer>
+}
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    public IEnumerable<Commande> Commandes { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        var authState = await authenticationState;
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+        Commandes = VaporService.FindAllCommandesTermineByUtilisateur(utilisateur);
+    }
+
+    private decimal GetTotalPrice(IEnumerable<ContenuCommande> contenusCommande)
+    {
+        decimal total = 0;
+        foreach (ContenuCommande contenuCommande in contenusCommande)
+        {
+            total += (decimal)contenuCommande.Jeu.Prix; // On ajoute le prix de chaque article au total
+        }
+        return total;
+    }
+}

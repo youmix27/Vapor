@@ -35,7 +35,7 @@
 @code{
     public List<Jeu> JeuxCaroussel { get; set; } = new();
 
-    protected override async void OnInitialized()
+    protected override void OnInitialized()
     {
         JeuxCaroussel.Add(VaporService.FindJeuByJaquette("gtav"));
         JeuxCaroussel.Add(VaporService.FindJeuByJaquette("shii"));

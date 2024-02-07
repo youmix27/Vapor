@@ -214,6 +214,18 @@ namespace POCSQLCO.Models
 
         #region Commande
 
+        public IEnumerable<Commande> FindAllCommandesTermineByUtilisateur(Utilisateur utilisateur)
+        {
+            try
+            {
+                return _context.Commandes.Include(c=>c.ContenuCommandes).ThenInclude(c=>c.Jeu).Where(c => c.UtilisateurId == utilisateur.Id).Where(c => c.EstTermine == true).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public Commande? FindCommandeNonTermineByUtilisateur(Utilisateur utilisateur)
         {
             try
@@ -300,6 +312,18 @@ namespace POCSQLCO.Models
 
         #region ContenuCommande
 
+        public ContenuCommande FindContenuCommandesByUtilisateurAndJeuAndCommandeNonTerminee(Utilisateur utilisateur, Jeu jeu)
+        {
+            try
+            {
+                return _context.ContenuCommandes.Include(cc => cc.Jeu).Include(cc => cc.Commande).Where(cc => cc.UtilisateurId == utilisateur.Id).Where(cc => cc.JeuId == jeu.Id).Where(cc => cc.Commande.EstTermine == false).FirstOrDefault();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public IEnumerable<ContenuCommande> FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(Utilisateur utilisateur)
         {
             try
@@ -316,7 +340,7 @@ namespace POCSQLCO.Models
         {
             try
             {
-                return _context.ContenuCommandes.Where(cc => cc.UtilisateurId == utilisateurId).Where(cc => cc.JeuId == jeuId).FirstOrDefault();
+                return _context.ContenuCommandes.Include(cc => cc.Commande).Where(cc => cc.UtilisateurId == utilisateurId).Where(cc => cc.JeuId == jeuId).FirstOrDefault();
             }
             catch
             {
