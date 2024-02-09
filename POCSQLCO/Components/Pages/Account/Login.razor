@@ -1,5 +1,4 @@
 ﻿@page "/Account/Login"
-
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using POCSQLCO.Models
@@ -10,6 +9,8 @@
 @inject Models.IVaporService VaporService
 
 <PageTitle>Connection</PageTitle>
+
+<component type="typeof(POCSQLCO.Components.Pages.Account.Login)" render-mode="Static" />
 
 <div class="row">
     <div class="col-lg-4 offset-lg-4 p-4 pb-4 border mt-4">

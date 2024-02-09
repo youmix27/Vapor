@@ -8,7 +8,28 @@
 
 <PageTitle>Catalogue Jeux</PageTitle>
 
-<MudDataGrid T="Jeu" Items="@jeux" Filterable="true" FilterMode="@DataGridFilterMode.ColumnFilterRow" FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive" RowClick="@RowClicked" Hover="true" RowClass="cursor-pointer">
+<MudItem xs="12" sm="6" md="4">
+    <MudAutocomplete T="string" Label="US States" @bind-Value="Genre" SearchFunc="@Search2"
+                     ResetValueOnEmptyText=true
+                     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
+</MudItem>
+<MudItem xs="12" md="12">
+    <MudText Class="mb-n3" Typo="Typo.body2">
+        <MudChip>@(Genre ?? "Not selected")</MudChip>
+    </MudText>
+</MudItem>
+
+<MudDataGrid 
+    T="Jeu"
+    Items="@Jeux"
+    Filterable="true" 
+    Virtualize="true" 
+    FixedHeader="true"  
+    FilterMode="@DataGridFilterMode.ColumnFilterRow" 
+    FilterCaseSensitivity="DataGridFilterCaseSensitivity.CaseInsensitive" 
+    RowClick="@RowClicked" 
+    Hover="true" 
+    RowClass="cursor-pointer">
     <Columns>
         <TemplateColumn CellClass="d-flex" Filterable="false">
             <CellTemplate>
@@ -26,7 +47,15 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
 
-    public IEnumerable<Jeu> jeux { get; set; }
+    public IEnumerable<Jeu> Jeux { get; set; }
+
+    public IEnumerable<Genre> Genres { get; set; }
+
+    public String Genre { get; set; }
+
+    public IEnumerable<Theme> Themes { get; set; }
+
+    public String Theme { get; set; }
 
     public string PreviewText { get; set; } = "A VENIR";
 
@@ -36,12 +65,25 @@
         if (authState.User.Identity.Name != null)
         {
             Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
-            jeux = VaporService.FindJeuxWithUtilisateur(utilisateur);
+            Jeux = VaporService.FindJeuxWithUtilisateur(utilisateur);
         }
         else
         {
-            jeux = VaporService.FindAllJeux();
+            Jeux = VaporService.FindAllJeux();
         }
+        Genres = VaporService.FindAllGenres();
+        Themes = VaporService.FindAllThemes();
+    }
+
+    private async Task<IEnumerable<string>> Search2(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, don't return values (drop-down will not open)
+        if (string.IsNullOrEmpty(value))
+            return new string[0];
+        return Genres.Select(x => x.Libelle).Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
     private string GetJeuSource(string jaquette)

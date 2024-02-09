@@ -1,14 +1,14 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<MudThemeProvider @rendermode="RenderMode.InteractiveServer"/>
+<MudDialogProvider @rendermode="RenderMode.InteractiveServer" />
+<MudSnackbarProvider @rendermode="RenderMode.InteractiveServer" />
 
 <MudLayout>
     <MudAppBar>
         My Application
     </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
+    <MudDrawer @bind-Open="@_drawerOpen" >
         <NavMenu/>
     </MudDrawer>
     <MudMainContent>
