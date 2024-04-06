@@ -6,37 +6,56 @@
 
 <PageTitle>@Jeu.Libelle</PageTitle>
 
-    <div Class="d-flex justify-center">
-    <MudPaper Width="80%" Class="">
-        <MudContainer Class="mt-4" Fixed = "true">
-            <MudGrid Justify="Justify.Center" >
-                
+    <div class="d-flex justify-center">
+        <MudPaper Width="80%" Class="">
+            <MudContainer Class="mt-4" Fixed="true">
+                <MudGrid Justify="Justify.FlexStart">
                     <MudItem xs="12" sm="8" md="6">
-                        <MudText Align="Align.Center" Variant="Variant.H4">@Jeu.Libelle</MudText>
-                        <MudImage ObjectFit="ObjectFit.Contain"  Src="@GetJeuSource(Jeu.Jaquette)" Alt="@Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
-                        <MudText Align="Align.Center">@Jeu.Description</MudText>
-                        @switch (ExcpetionAchatJeu)
+                    <MudText Align="Align.Left" Typo="Typo.h4">@Jeu.Libelle</MudText>
+                    <MudImage  ObjectFit="ObjectFit.Contain" Src="@GetJeuSource(Jeu.Jaquette)" Alt="@Jeu.Jaquette" Elevation="25" Class="rounded-lg mx-auto mt-2" />
+                    <MudText Align="Align.Left" Class="m-2">@Jeu.Description</MudText>
+                        @if (Jeu.Distributeur is not null)
+                    {
+                        <MudText Align="Align.Left">Distributeur : @Jeu.Distributeur.Libelle</MudText>
+                    }
+                    @if (Jeu.Developpeur is not null)
+                    {
+                        <MudText Align="Align.Left">Développeur : @Jeu.Developpeur.Libelle</MudText>
+                    }
+                    <MudText Align="Align.Left">
+                        Genre.s : @foreach (Genre genre in Jeu.Genres)
+                        {
+                            <span>@genre.Libelle, </span>
+                        }
+                    </MudText>
+                    <MudText Align="Align.Left">
+                        Thème.s : @foreach (Theme theme in Jeu.Themes)
+                        {
+                            <span>@theme.Libelle, </span>
+                        }
+                    </MudText>
+
+                    @switch (ExcpetionAchatJeu)
                     {
                         case "aucune":
-                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" @onclick="() => AjouterAuPanier()">Ajouter au panier</MudButton>
+                            <MudButton Class="m-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" @onclick="() => AjouterAuPanier()">Ajouter au panier</MudButton>
                             break;
                         case "auPanier":
-                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Href="/panier">Jeu dans le panier</MudButton>
+                            <MudButton Class="m-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Href="/panier">Jeu dans le panier</MudButton>
                             break;
                         case "nonSortie":
-                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Disabled>Sortie prochaine</MudButton>
+                            <MudButton Class="m-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Disabled>Sortie prochaine</MudButton>
                             break;
                         case "nonConnecte":
-                            <MudButton Class="mt-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Href="/Account/Login">Veuillez vous connecter</MudButton>
+                            <MudButton Class="m-4" Color="Color.Primary" Variant="Variant.Filled" FullWidth="true" Href="/Account/Login">Veuillez vous connecter</MudButton>
                             break;
                     }
-                    
-                    </MudItem>
-                
+                </MudItem>
             </MudGrid>
         </MudContainer>
     </MudPaper>
-    </div>
+</div>
+
 
 
 @code {

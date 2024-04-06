@@ -26,7 +26,7 @@ public partial class Utilisateur
     [Required(AllowEmptyStrings = false, ErrorMessage = "veuillez remplir ce champ")]
     public string? Adresse { get; set; }
     [Required(AllowEmptyStrings = false, ErrorMessage = "veuillez remplir ce champ")]
-    [RegularExpression(@"^d{5}$", ErrorMessage = "veuillez renseigner un code postal valide")]
+    [RegularExpression(@"^(?:0[1-9]|[1-8]\d|9[0-8]|2[ABab])\d{3}$", ErrorMessage = "Code postal invaldie")]
     public string? CodePostal { get; set; }
     [Required(AllowEmptyStrings = false, ErrorMessage = "veuillez remplir ce champ")]
     [RegularExpression(@"^0\d{9}$", ErrorMessage = "veuillez renseigner un numéro de téléphone valide")]

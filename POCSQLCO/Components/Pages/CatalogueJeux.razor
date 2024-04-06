@@ -8,16 +8,13 @@
 
 <PageTitle>Catalogue Jeux</PageTitle>
 
+<div class=" m-4">
 <MudItem xs="12" sm="6" md="4">
-    <MudAutocomplete T="string" Label="US States" @bind-Value="Genre" SearchFunc="@Search2"
+    <MudAutocomplete T="string" Label="Genre" Value="Genre" ValueChanged="FiltreGenre" SearchFunc="@Search2"
                      ResetValueOnEmptyText=true
                      AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
 </MudItem>
-<MudItem xs="12" md="12">
-    <MudText Class="mb-n3" Typo="Typo.body2">
-        <MudChip>@(Genre ?? "Not selected")</MudChip>
-    </MudText>
-</MudItem>
+</div>
 
 <MudDataGrid 
     T="Jeu"
@@ -51,7 +48,7 @@
 
     public IEnumerable<Genre> Genres { get; set; }
 
-    public String Genre { get; set; }
+    public String Genre { get; set; } = String.Empty;
 
     public IEnumerable<Theme> Themes { get; set; }
 
@@ -77,7 +74,6 @@
 
     private async Task<IEnumerable<string>> Search2(string value)
     {
-        // In real life use an asynchronous function for fetching data from an api.
         await Task.Delay(5);
 
         // if text is null or empty, don't return values (drop-down will not open)
@@ -91,9 +87,24 @@
         return "img/jeux/" + jaquette + ".jpg";
     }
 
-    void RowClicked(DataGridRowClickEventArgs<Jeu> args)
+    private void RowClicked(DataGridRowClickEventArgs<Jeu> args)
     {
         navManager.NavigateTo("/Jeu/" + args.Item.Jaquette);
+    }
+
+    private async void FiltreGenre(string value)
+    {
+        Genre = value;
+        var authState = await authenticationState;
+        if (authState.User.Identity.Name != null)
+        {
+            Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+            Jeux = VaporService.FindJeuxWithUtilisateurAndGenre(utilisateur, Genre);
+        }
+        else
+        {
+            Jeux = VaporService.FindJeuxByGenre(Genre);
+        }
     }
 
 }

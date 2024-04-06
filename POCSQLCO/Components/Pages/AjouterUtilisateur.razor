@@ -1,0 +1,112 @@
+﻿@using POCSQLCO.Models
+@inject ISnackbar Snackbar
+@inject Models.IVaporService VaporService
+@using System.ComponentModel.DataAnnotations
+@rendermode InteractiveServer
+
+<EditForm Model=@nouvelUtilisateur OnValidSubmit="Ajouter">
+    <DataAnnotationsValidator />
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                Ajouter Utilisateur
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField @bind-Value="nouvelUtilisateur.Pseudo" For="@(() => nouvelUtilisateur.Pseudo)" Label="Pseudo" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Password" For="@(() => nouvelUtilisateur.Password)" Label="Mot de passe" HelperText="choisissez un mdp fort" InputType="InputType.Password" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Password2" For="@(() => nouvelUtilisateur.Password2)" Label="Mot de passe" HelperText="répéter le mot de passe" InputType="InputType.Password" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Email" For="@(() => nouvelUtilisateur.Email)" Label="Mail" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Nom" For="@(() => nouvelUtilisateur.Nom)" Label="Nom" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Prenom" For="@(() => nouvelUtilisateur.Prenom)" Label="Prenom" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Ville" For="@(() => nouvelUtilisateur.Ville)" Label="Ville" />
+            <MudTextField @bind-Value="nouvelUtilisateur.CodePostal" For="@(() => nouvelUtilisateur.CodePostal)" Label="Code Postal" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Adresse" For="@(() => nouvelUtilisateur.Adresse)" Label="Adresse" />
+            <MudTextField @bind-Value="nouvelUtilisateur.Telephone" For="@(() => nouvelUtilisateur.Telephone)" Label="Numéro de Téléphone" />
+        </DialogContent>
+        <DialogActions>
+            <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPseudo">Nom d'utilisateur déjà utilisé par un autre compte'</MudAlert>
+            <MudButton OnClick="Cancel">Annuler</MudButton>
+            <MudButton Color="Color.Primary" ButtonType="ButtonType.Submit">Ajouter</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public Utilisateur utilisateur { get; set; }
+    public NewUtilisateur nouvelUtilisateur { get; set; } = new NewUtilisateur();
+    public bool ErrorPseudo { get; set; } = true;
+
+    public class NewUtilisateur
+    {
+        [Required]
+        [StringLength(12, ErrorMessage = "Pseudo trop longue. (max char : 12)")]
+        public string Pseudo { get; set; }
+
+        [Required]
+        [StringLength(30, ErrorMessage = "Le mot de passe doit faire 8 char minimum.", MinimumLength = 8)]
+        public string Password { get; set; }
+
+        [Required]
+        [Compare(nameof(Password), ErrorMessage = "Les deux mots de passe doivent être identique.")]
+        public string Password2 { get; set; }
+        [Required]
+        [StringLength(20, ErrorMessage = "Nom trop long (max : 20 char)")]
+        public string Nom { get; set; }
+        [StringLength(20, ErrorMessage = "Prenom trop long (max : 20 char)")]
+        [Required]
+        public string Prenom { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        [StringLength(20, ErrorMessage = "Ville trop longue. (max char : 20)")]
+        public string Ville { get; set; }
+        [Required]
+        [StringLength(100, ErrorMessage = "Adresse trop longue. (max char : 100)")]
+        public string Adresse { get; set; }
+        [Required]
+        [RegularExpression(@"^(?:0[1-9]|[1-8]\d|9[0-8]|2[ABab])\d{3}$", ErrorMessage = "Code postal invaldie")]
+        public string CodePostal { get; set; }
+        [Required]
+        [RegularExpression(@"^0\d{9}$", ErrorMessage = "Numéro de téléphone invaldie")]
+        public string Telephone { get; set; }
+
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Ajouter()
+    {
+        Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(nouvelUtilisateur.Pseudo);
+        if (utilisateur == null)
+        {
+            utilisateur = new Utilisateur();
+            utilisateur.Pseudo = nouvelUtilisateur.Pseudo;
+            utilisateur.Email = nouvelUtilisateur.Email;
+            utilisateur.Adresse = nouvelUtilisateur.Adresse;
+            utilisateur.Telephone = nouvelUtilisateur.Telephone;
+            utilisateur.FiltreCs = true; //par défaut on filtre les contenus explicites, l'utilisateur devra le modifié manuellement dans les paramètres de son compte
+            utilisateur.FiltreGore = true;
+            utilisateur.CodePostal = nouvelUtilisateur.CodePostal;
+            utilisateur.Ville = nouvelUtilisateur.Ville;
+            utilisateur.Nom = nouvelUtilisateur.Nom;
+            utilisateur.Prenom = nouvelUtilisateur.Prenom;
+            utilisateur.IsAdmin = false;
+            //création hash mot de passe
+            utilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(nouvelUtilisateur.Password);
+            VaporService.InsertUtilisateur(utilisateur);
+            Snackbar.Add("utilisateur ajouté", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(utilisateur.Id));
+        }
+        else
+        {
+            ErrorPseudo = false;
+        }
+    }
+}

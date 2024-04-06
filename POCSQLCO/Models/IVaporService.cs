@@ -2,6 +2,9 @@
 {
     public interface IVaporService
     {
+
+        IEnumerable<Jeu> FindJeuxByGenre(String genreLibelle);
+        IEnumerable<Jeu> FindJeuxWithUtilisateurAndGenre(Utilisateur utilisateur, String genreLibelle);
         IEnumerable<Commande> FindAllCommandesTermineByUtilisateur(Utilisateur utilisateur);
         ContenuCommande FindContenuCommandesByUtilisateurAndJeuAndCommandeNonTerminee(Utilisateur utilisateur, Jeu jeu);
         IEnumerable<ContenuCommande> FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(Utilisateur utilisateur);

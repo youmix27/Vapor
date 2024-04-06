@@ -1,0 +1,72 @@
+﻿@page "/admin/user"
+
+@using Microsoft.AspNetCore.Authorization
+@using POCSQLCO.Models
+@rendermode InteractiveServer
+@inject Models.IVaporService VaporService
+@using System.Net.Http.Json
+@inject IDialogService DialogService
+@inject NavigationManager navManager
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>Gestion des utilisateurs</PageTitle>
+
+<MudText Typo="Typo.h5" Align="Align.Center" Class="m-4"> <b> Gestion Des Utilisateurs </b> </MudText>
+
+<MudButton OnClick="@AjouterUtilisateur" Variant="Variant.Filled" Color="@Color.Success" Class="add-item-btn m-3">Ajouter un utilisateur</MudButton>
+
+<MudDataGrid T="Utilisateur" Items="@utilisateurs" StartedEditingItem="@ModifierUtilisateur" CanceledEditingItem="@SupprimerUtilisateur"
+             Bordered="true" Dense="true">
+    <Columns>
+        <PropertyColumn Property="x => x.Id.ToString()" Title="Nr" IsEditable="false" />
+        <PropertyColumn Property="x => x.Pseudo" />
+        <PropertyColumn Property="x => x.Prenom" />
+        <PropertyColumn Property="x => x.Nom" />
+        <PropertyColumn Property="x => x.Email" />
+        <PropertyColumn Property="x => x.Telephone" />
+        <PropertyColumn Property="x => x.Adresse" />
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton Size="@Size.Small" Variant="Variant.Text" Color="@Color.Primary" @onclick="() => ModifierUtilisateur(context.Item)">Modifier</MudButton>
+                    <MudButton Size="@Size.Small" Variant="Variant.Text" Color="@Color.Warning" @onclick="() => SupprimerUtilisateur(context.Item)">Supprimer</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+
+
+@code {
+    public IEnumerable<Utilisateur> utilisateurs { get; set; }
+    private List<string> _events = new();
+    protected override void OnInitialized()
+    {
+        utilisateurs = VaporService.FindAllUtilisateurs();
+    }
+
+    // events
+    async Task ModifierUtilisateur(Utilisateur utilisateur)
+    {
+        var parameters = new DialogParameters<EditUtilisateur> { { x => x.oldUtilisateur, utilisateur  } };
+        var dialog = await DialogService.ShowAsync<EditUtilisateur>("modifier utilisateur", parameters, new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true });
+        var result = await dialog.Result;
+        navManager.NavigateTo("/admin/user", true);
+    }
+
+    async Task SupprimerUtilisateur(Utilisateur utilisateur)
+    {
+        var parameters = new DialogParameters<SupprimerUtilisateur> { { x => x.utilisateur, utilisateur } };
+        var dialog = await DialogService.ShowAsync<SupprimerUtilisateur>("Supprimer utilisateur", parameters);
+        var result = await dialog.Result;
+        utilisateurs = VaporService.FindAllUtilisateurs();
+    }
+
+    async Task AjouterUtilisateur()
+    {
+        var dialog = await DialogService.ShowAsync<AjouterUtilisateur>("Ajouter utilisateur", new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true });
+        var result = await dialog.Result;
+        utilisateurs = VaporService.FindAllUtilisateurs();
+    }
+}

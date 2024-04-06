@@ -13,6 +13,49 @@ namespace POCSQLCO.Models
 
         #region Jeu
 
+        public IEnumerable<Jeu> FindJeuxByGenre(String genreLibelle)
+        {
+            try
+            {
+                return _context.Jeux.Include(u => u.Genres).Where(u => u.Genres.Any(g => g.Libelle == genreLibelle)).ToList();
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public IEnumerable<Jeu> FindJeuxWithUtilisateurAndGenre(Utilisateur utilisateur, String genreLibelle)
+        {
+            try
+            {
+                if (utilisateur.FiltreCs && utilisateur.FiltreGore)
+                {
+                    return _context.Jeux.Include(u => u.Genres)
+                                        .Where(u => u.ContientGore == false)
+                                        .Where(u => u.ContientCs == false)
+                                        .Where(u => u.Genres.Any(g => g.Libelle == genreLibelle))
+                                        .ToList();
+                }
+                else if (utilisateur.FiltreCs)
+                {
+                    return _context.Jeux.Include(u => u.Genres).Where(u => u.ContientCs == false).Where(u => u.Genres.Any(g => g.Libelle == genreLibelle)).ToList();
+                }
+                else if (utilisateur.FiltreGore)
+                {
+                    return _context.Jeux.Include(u => u.Genres).Where(u => u.ContientGore == false).Where(u => u.Genres.Any(g => g.Libelle == genreLibelle)).ToList();
+                }
+                else
+                {
+                    return _context.Jeux.Include(u => u.Genres).Where(u => u.Genres.Any(g => g.Libelle == genreLibelle)).ToList();
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         public IEnumerable<Jeu> FindJeuxWithUtilisateur(Utilisateur utilisateur)
         {
             try
@@ -44,7 +87,12 @@ namespace POCSQLCO.Models
         {
             try
             {
-                return _context.Jeux.Where(j => j.Jaquette == jaquette).SingleOrDefault();
+                return _context.Jeux.Include(j => j.Developpeur)
+                                    .Include(j => j.Distributeur)
+                                    .Include(j => j.Genres)
+                                    .Include(j => j.Themes)
+                                    .Where(j => j.Jaquette == jaquette)
+                                    .SingleOrDefault();
             }
             catch
             {

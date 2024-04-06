@@ -1,0 +1,67 @@
+﻿@using POCSQLCO.Models
+@inject ISnackbar Snackbar
+@inject Models.IVaporService VaporService
+@rendermode InteractiveServer
+
+<EditForm Model=@oldUtilisateur OnValidSubmit="Update">
+    <DataAnnotationsValidator />
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">
+                Modifier Utilisateur
+            </MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4"> Mon compte </MudText>
+            <MudTextField @bind-Value="oldUtilisateur.Pseudo" For="@(() => oldUtilisateur.Pseudo)" Label="Pseudo" />
+            <MudTextField @bind-Value="oldUtilisateur.Email" For="@(() => oldUtilisateur.Email)" Label="Mail" />
+            <MudTextField @bind-Value="oldUtilisateur.Nom" For="@(() => oldUtilisateur.Nom)" Label="Nom" />
+            <MudTextField @bind-Value="oldUtilisateur.Prenom" For="@(() => oldUtilisateur.Prenom)" Label="Prenom" />
+            <MudTextField @bind-Value="oldUtilisateur.Ville" For="@(() => oldUtilisateur.Ville)" Label="Ville" />
+            <MudTextField @bind-Value="oldUtilisateur.CodePostal" For="@(() => oldUtilisateur.CodePostal)" Label="Code Postal" />
+            <MudTextField @bind-Value="oldUtilisateur.Adresse" For="@(() => oldUtilisateur.Adresse)" Label="Adresse" />
+            <MudTextField @bind-Value="oldUtilisateur.Telephone" For="@(() => oldUtilisateur.Telephone)" Label="Numéro de Téléphone" />
+            <MudCheckBox @bind-Value="oldUtilisateur.FiltreCs" Label="afficher contenu à caractère sexuel"></MudCheckBox>
+            <MudCheckBox @bind-Value="oldUtilisateur.FiltreGore" Label="afficher contenu à caractère gore"></MudCheckBox>
+        </DialogContent>
+        <DialogActions>
+            <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPseudo">Nom d'utilisateur déjà utilisé par un autre compte'</MudAlert>
+            <MudButton OnClick="Cancel">Annuler</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Modifier</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Utilisateur oldUtilisateur { get; set; } = new Utilisateur();
+
+    protected string Pseudo { get; set; }
+
+    public bool ErrorPseudo { get; set; } = true;
+
+    protected override void OnInitialized()
+    {
+        Pseudo = oldUtilisateur.Pseudo;
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void Update(EditContext context)
+    {
+        Utilisateur utilisateurVerificationPseudoDouble = VaporService.FindUtilisateurByPseudo(oldUtilisateur.Pseudo);
+        if (oldUtilisateur.Pseudo != Pseudo && utilisateurVerificationPseudoDouble != null) // si le pseudo a été changé, on vérifit que celui ci ne soit pas utilisé par un autre compte
+        {
+            ErrorPseudo = false;
+            return;
+        }
+        VaporService.UpdateUtilisateur(oldUtilisateur);
+        Snackbar.Add("utilisateur modifié", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(oldUtilisateur.Id));
+    }
+
+}
