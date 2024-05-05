@@ -14,7 +14,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Annuler</MudButton>
-        <MudButton Color="Color.Warning" OnClick="Supprimer">Supprimer</MudButton>
+        <MudButton Color="Color.Warning" OnClick="Delete">Supprimer</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -28,7 +28,7 @@
         MudDialog.Cancel();
     }
 
-    private void Supprimer()
+    private void Delete()
     {
         //In a real world scenario this bool would probably be a service to delete the item from api/database
         VaporService.DeleteUtilisateur(utilisateur);

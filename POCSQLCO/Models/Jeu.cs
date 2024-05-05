@@ -38,4 +38,12 @@ public partial class Jeu
     public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
 
     public virtual ICollection<Theme> Themes { get; set; } = new List<Theme>();
+
+    /*
+     * Renvoie le chemin d'accès de la jaquette
+     */
+    public string GetJeuSource()
+    {
+        return "img/jeux/" + this.Jaquette + ".jpg";
+    }
 }

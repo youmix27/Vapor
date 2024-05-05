@@ -4,7 +4,7 @@
 @using System.ComponentModel.DataAnnotations
 @rendermode InteractiveServer
 
-<EditForm Model=@nouvelUtilisateur OnValidSubmit="Ajouter">
+<EditForm Model=@nouvelUtilisateur OnValidSubmit="Add">
     <DataAnnotationsValidator />
     <MudDialog>
         <TitleContent>
@@ -81,7 +81,7 @@
         MudDialog.Cancel();
     }
 
-    private void Ajouter()
+    private void Add()
     {
         Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(nouvelUtilisateur.Pseudo);
         if (utilisateur == null)

@@ -15,20 +15,25 @@
     <Columns>
         <TemplateColumn>
             <CellTemplate>
-                <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@GetJeuSource(context.Item.Jeu.Jaquette)" Alt="@context.Item.Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
+                    <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@context.Item.Jeu.GetJeuSource()" Alt="@context.Item.Jeu.Jaquette" Elevation="25" Class="rounded-lg" />
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Jeu.Libelle" />
         <PropertyColumn Property="x => x.Jeu.Prix" />
+        <TemplateColumn Title="Quantité">
+            <CellTemplate>
+                    <MudNumericField T="int" Value="context.Item.Quantite" ValueChanged="(int value) => UpdateQuantite(value, context.Item)" Min="1" Max="10" />
+            </CellTemplate>
+        </TemplateColumn>
         <TemplateColumn >
             <CellTemplate>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"  @onclick="() => SupprimerJeuDuPanier(context.Item)"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" @onclick="() => DeleteJeuFromCart(context.Item)"></MudIconButton>
             </CellTemplate>
         </TemplateColumn>
     </Columns>
 </MudDataGrid>
-    <MudText Typo="Typo.h6">Totale : <b>@PrixTotale</b></MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ValiderPanier()">valider le panier</MudButton>
+    <MudText Typo="Typo.h6" Class="ml-4">Totale : <b>@PrixTotale</b></MudText>
+    <MudButton Class="ml-4"  Variant="Variant.Filled" Color="Color.Primary" @onclick="() => ValidateCart()">valider le panier</MudButton>
 }else{
     <MudAlert Severity="Severity.Info" Class="mt-4">Vous n'avez actuellement pas de panier.</MudAlert>
 }
@@ -52,21 +57,32 @@
         ContenuPanier = VaporService.FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(utilisateur);
         foreach(ContenuCommande jeuPanier in ContenuPanier)
         {
-            PrixTotale += (decimal)jeuPanier.Jeu.Prix;
+            PrixTotale += (decimal)jeuPanier.Jeu.Prix * jeuPanier.Quantite;
         }
     }
 
-    private string GetJeuSource(string jaquette)
+    /*
+    * Met à jour le champ quantite dans la base de donnée et recharge la page
+    */
+    protected void UpdateQuantite(int value, ContenuCommande contenuCommande)
     {
-        return "img/jeux/" + jaquette + ".jpg";
+        contenuCommande.Quantite = value; 
+        VaporService.UpdateContenuCommande(contenuCommande);
+        navManager.NavigateTo("/panier", true); //on recharge la page pour mettre à jour le total du panier
     }
 
-    protected void SupprimerJeuDuPanier(ContenuCommande Produit)
+    /*
+     * Supprime le jeu du panier de l'utilisateur
+     */
+    protected void DeleteJeuFromCart(ContenuCommande Produit)
     {
         VaporService.DeleteContenuCommande(Produit);
     }
 
-    protected void ValiderPanier()
+    /*
+     * Valide le panier de l'utilisateur
+     */
+    protected void ValidateCart()
     {
         Commande.EstTermine = true;
         Commande.Date = DateOnly.FromDateTime(DateTime.Now);

@@ -11,6 +11,8 @@ public partial class ContenuCommande
 
     public int JeuId { get; set; }
 
+    public int Quantite { get; set; }
+
     public virtual Commande Commande { get; set; } = null!;
 
     public virtual Jeu Jeu { get; set; } = null!;

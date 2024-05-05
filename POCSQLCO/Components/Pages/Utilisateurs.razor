@@ -13,9 +13,9 @@
 
 <MudText Typo="Typo.h5" Align="Align.Center" Class="m-4"> <b> Gestion Des Utilisateurs </b> </MudText>
 
-<MudButton OnClick="@AjouterUtilisateur" Variant="Variant.Filled" Color="@Color.Success" Class="add-item-btn m-3">Ajouter un utilisateur</MudButton>
+<MudButton OnClick="@AddUtilisateur" Variant="Variant.Filled" Color="@Color.Success" Class="add-item-btn m-3">Ajouter un utilisateur</MudButton>
 
-<MudDataGrid T="Utilisateur" Items="@utilisateurs" StartedEditingItem="@ModifierUtilisateur" CanceledEditingItem="@SupprimerUtilisateur"
+<MudDataGrid T="Utilisateur" Items="@utilisateurs" StartedEditingItem="@UpdateUtilisateur" CanceledEditingItem="@DeleteUtilisateur"
              Bordered="true" Dense="true">
     <Columns>
         <PropertyColumn Property="x => x.Id.ToString()" Title="Nr" IsEditable="false" />
@@ -28,8 +28,8 @@
         <TemplateColumn CellClass="d-flex justify-end">
             <CellTemplate>
                 <MudStack Row>
-                    <MudButton Size="@Size.Small" Variant="Variant.Text" Color="@Color.Primary" @onclick="() => ModifierUtilisateur(context.Item)">Modifier</MudButton>
-                    <MudButton Size="@Size.Small" Variant="Variant.Text" Color="@Color.Warning" @onclick="() => SupprimerUtilisateur(context.Item)">Supprimer</MudButton>
+                    <MudButton Size="@Size.Small" Variant="Variant.Text" Color="@Color.Primary" @onclick="() => UpdateUtilisateur(context.Item)">Modifier</MudButton>
+                    <MudButton Size="@Size.Small" Variant="Variant.Text" Color="@Color.Warning" @onclick="() => DeleteUtilisateur(context.Item)">Supprimer</MudButton>
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>
@@ -47,7 +47,7 @@
     }
 
     // events
-    async Task ModifierUtilisateur(Utilisateur utilisateur)
+    async Task UpdateUtilisateur(Utilisateur utilisateur)
     {
         var parameters = new DialogParameters<EditUtilisateur> { { x => x.oldUtilisateur, utilisateur  } };
         var dialog = await DialogService.ShowAsync<EditUtilisateur>("modifier utilisateur", parameters, new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true });
@@ -55,7 +55,7 @@
         navManager.NavigateTo("/admin/user", true);
     }
 
-    async Task SupprimerUtilisateur(Utilisateur utilisateur)
+    async Task DeleteUtilisateur(Utilisateur utilisateur)
     {
         var parameters = new DialogParameters<SupprimerUtilisateur> { { x => x.utilisateur, utilisateur } };
         var dialog = await DialogService.ShowAsync<SupprimerUtilisateur>("Supprimer utilisateur", parameters);
@@ -63,7 +63,7 @@
         utilisateurs = VaporService.FindAllUtilisateurs();
     }
 
-    async Task AjouterUtilisateur()
+    async Task AddUtilisateur()
     {
         var dialog = await DialogService.ShowAsync<AjouterUtilisateur>("Ajouter utilisateur", new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true });
         var result = await dialog.Result;

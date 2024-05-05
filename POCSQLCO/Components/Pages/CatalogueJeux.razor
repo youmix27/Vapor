@@ -10,7 +10,7 @@
 
 <div class=" m-4">
 <MudItem xs="12" sm="6" md="4">
-    <MudAutocomplete T="string" Label="Genre" Value="Genre" ValueChanged="FiltreGenre" SearchFunc="@Search2"
+        <MudAutocomplete T="string" Label="Genre" Value="Genre" ValueChanged="FiltreGenre" SearchFunc="@SearchGenre"
                      ResetValueOnEmptyText=true
                      AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />
 </MudItem>
@@ -30,7 +30,7 @@
     <Columns>
         <TemplateColumn CellClass="d-flex" Filterable="false">
             <CellTemplate>
-                <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@GetJeuSource(context.Item.Jaquette)" Alt="@context.Item.Jaquette" Elevation="25" Class="rounded-lg" />
+                <MudImage ObjectFit="ObjectFit.Contain" Height="100" Src="@context.Item.GetJeuSource()" Alt="@context.Item.Jaquette" Elevation="25" Class="rounded-lg" />
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Libelle" />
@@ -59,12 +59,12 @@
     protected override async void OnInitialized()
     {
         var authState = await authenticationState;
-        if (authState.User.Identity.Name != null)
+        if (authState.User.Identity.Name != null) // on vérifié si l'utilisateur est authentifié pour pouvoir lui appliquer les filtres propres à son compte
         {
             Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
             Jeux = VaporService.FindJeuxWithUtilisateur(utilisateur);
         }
-        else
+        else //si l'utilisateur est non-authentifié, aucun filtre par défaut n'est appliqué
         {
             Jeux = VaporService.FindAllJeux();
         }
@@ -72,38 +72,57 @@
         Themes = VaporService.FindAllThemes();
     }
 
-    private async Task<IEnumerable<string>> Search2(string value)
+    /*
+     * renvoie l'auto-complétion du filtre par genre
+     */
+    private async Task<IEnumerable<string>> SearchGenre(string value)
     {
         await Task.Delay(5);
 
-        // if text is null or empty, don't return values (drop-down will not open)
+        // si le champ est vide, l'auto-complétion ne renvoie rien
         if (string.IsNullOrEmpty(value))
             return new string[0];
         return Genres.Select(x => x.Libelle).Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    private string GetJeuSource(string jaquette)
-    {
-        return "img/jeux/" + jaquette + ".jpg";
-    }
-
+    /*
+     * Renvoie l'utilisateur sur la page du jeu cliqué
+     */
     private void RowClicked(DataGridRowClickEventArgs<Jeu> args)
     {
         navManager.NavigateTo("/Jeu/" + args.Item.Jaquette);
     }
 
+    /*
+     * Méthode permettant de filtrer les jeux selon le genre sélectionner par l'utilisateur
+     */
     private async void FiltreGenre(string value)
     {
-        Genre = value;
         var authState = await authenticationState;
-        if (authState.User.Identity.Name != null)
+        if (!string.IsNullOrEmpty(value)) // on s'assure que le champ ne soit pas vide
         {
-            Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
-            Jeux = VaporService.FindJeuxWithUtilisateurAndGenre(utilisateur, Genre);
+            Genre = value;
+            if (authState.User.Identity.Name != null)
+            {
+                Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+                Jeux = VaporService.FindJeuxWithUtilisateurAndGenre(utilisateur, Genre);
+            }
+            else
+            {
+                Jeux = VaporService.FindJeuxByGenre(Genre);
+            }
         }
-        else
+        else //si il est vide, on affiche l'ensemble du catalogue non filtré par genre
         {
-            Jeux = VaporService.FindJeuxByGenre(Genre);
+            if (authState.User.Identity.Name != null)
+            {
+                Utilisateur utilisateur = VaporService.FindUtilisateurByPseudo(authState.User.Identity.Name);
+                Jeux = VaporService.FindJeuxWithUtilisateur(utilisateur);
+            }
+            else
+            {
+                Jeux = VaporService.FindAllJeux();
+            }
         }
     }
 

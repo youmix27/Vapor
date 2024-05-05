@@ -64,6 +64,7 @@ public partial class VaporContext : DbContext
             entity.Property(e => e.CommandeId).HasColumnName("commande_id");
             entity.Property(e => e.JeuId).HasColumnName("jeu_id");
             entity.Property(e => e.UtilisateurId).HasColumnName("utilisateur_id");
+            entity.Property(e => e.Quantite).HasColumnName("quantite");
 
             entity.HasOne(d => d.Jeu).WithMany(p => p.ContenuCommandes)
                 .HasForeignKey(d => d.JeuId)

@@ -9,7 +9,7 @@
 
 <PageTitle>Historique Achat</PageTitle>
 
-@foreach(Commande commande in Commandes)
+@foreach(Commande commande in Commandes.Reverse())
 {
     <MudContainer Class="justify-center">
         <MudPaper Class="ribbon mt-4" Width="90%">
@@ -18,7 +18,7 @@
                 <MudList Class="order-items" Dense="true">
                     @foreach (ContenuCommande contenuCommande in commande.ContenuCommandes)
                 {
-                    <MudListItem>- @contenuCommande.Jeu.Libelle - @contenuCommande.Jeu.Prix €</MudListItem>
+                    <MudListItem>- @contenuCommande.Jeu.Libelle - @contenuCommande.Jeu.Prix € - Qte : @contenuCommande.Quantite.ToString() </MudListItem>
                 }
                 <MudListItem>   Totale : @GetTotalPrice(commande.ContenuCommandes) €</MudListItem>
             </MudList>
@@ -40,12 +40,15 @@
         Commandes = VaporService.FindAllCommandesTermineByUtilisateur(utilisateur);
     }
 
+    /*
+     * Renvoie le prix total de la commande
+     */
     private decimal GetTotalPrice(IEnumerable<ContenuCommande> contenusCommande)
     {
         decimal total = 0;
         foreach (ContenuCommande contenuCommande in contenusCommande)
         {
-            total += (decimal)contenuCommande.Jeu.Prix; // On ajoute le prix de chaque article au total
+            total += (decimal)contenuCommande.Jeu.Prix * contenuCommande.Quantite; // On ajoute le prix de chaque article fois leur quantité au total
         }
         return total;
     }

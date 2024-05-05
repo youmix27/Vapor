@@ -12,7 +12,7 @@
         {
             <MudCarouselItem Transition="Transition.Slide" @onclick="() => ItemClick(jeu.Jaquette)">
                 <div class="d-flex justify-center position-relative" style="height:90%; cursor: pointer">
-                    <MudImage ObjectFit="ObjectFit.Contain" Height="350" Src="@GetJeuSource(jeu.Jaquette)" Alt="@jeu.Jaquette" Elevation="25" Class="rounded-lg" />
+                    <MudImage ObjectFit="ObjectFit.Contain" Height="350" Src="@jeu.GetJeuSource()" Alt="@jeu.Jaquette" Elevation="25" Class="rounded-lg" />
                     <MudPaper Elevation="25" Style="position: absolute; bottom: 0; left: auto; width: 85%; background-color: rgba(0, 0, 0, 0.6); padding: 20px; color: ghostwhite;" Class="rounded-lg">
                         <div class="d-flex justify-space-between align-center">
                             <MudText Typo="Typo.h4"><b>@jeu.Libelle</b></MudText>
@@ -37,15 +37,15 @@
 
     protected override void OnInitialized()
     {
+        //le carousel est peuplé manuellement
         JeuxCaroussel.Add(VaporService.FindJeuByJaquette("gtav"));
-        JeuxCaroussel.Add(VaporService.FindJeuByJaquette("shii"));
+        JeuxCaroussel.Add(VaporService.FindJeuByJaquette("mgsv"));
         JeuxCaroussel.Add(VaporService.FindJeuByJaquette("deathloop"));
     }
 
-    private string GetJeuSource(string jaquette){
-        return "img/jeux/" + jaquette + ".jpg";
-    }
-
+    /*
+     * Redirige l'utilisateur sur la page du jeu cliqué
+     */
     private void ItemClick(string jacquette)
     {
         navManager.NavigateTo("/Jeu/" + jacquette);
