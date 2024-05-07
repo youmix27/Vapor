@@ -2,6 +2,7 @@
 @using POCSQLCO.Models
 @inject Models.IVaporService VaporService
 @inject NavigationManager navManager
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 <PageTitle>@Jeu.Libelle</PageTitle>
@@ -128,7 +129,7 @@
         contenuCommande.JeuId = Jeu.Id;
         contenuCommande.Quantite = 1;
         VaporService.InsertContenuCommande(contenuCommande);
-        navManager.NavigateTo("/Jeu/" + Jeu.Jaquette, true);
+        Snackbar.Add("Jeu ajouté au panier", Severity.Success);
     }
 
 }

@@ -52,7 +52,8 @@
         var parameters = new DialogParameters<EditUtilisateur> { { x => x.oldUtilisateur, utilisateur  } };
         var dialog = await DialogService.ShowAsync<EditUtilisateur>("modifier utilisateur", parameters, new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true });
         var result = await dialog.Result;
-        navManager.NavigateTo("/admin/user", true);
+        var test = result;
+        utilisateurs = VaporService.FindAllUtilisateurs();
     }
 
     async Task DeleteUtilisateur(Utilisateur utilisateur)

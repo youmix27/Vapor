@@ -7,6 +7,7 @@
 @using System.Security.Cryptography
 @inject Models.IVaporService VaporService
 @inject NavigationManager NavManager
+@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 @attribute [Authorize(Roles = "Administrator, User")]
 
@@ -34,7 +35,7 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
                 </MudPaper>
             </EditForm>
-            <EditForm Model=@newPassword OnValidSubmit="Update">
+            <EditForm Model=@newPassword OnValidSubmit="UpdatePassword">
                 <MudPaper Class="pa-4 mt-4">
                     <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4"> Modifier Mot de Passe </MudText>
                     <MudTextField @bind-Value="newPassword.AncienPassword" For="@(() => newPassword.AncienPassword)" InputType="InputType.Password" Label="Ancien Mot de Passe" />
@@ -96,15 +97,17 @@
             return;
         }
         VaporService.UpdateUtilisateur(oldUtilisateur);
+        Snackbar.Add("Compte mise à jour", Severity.Success);
     }
 
-    private void Update()
+    private void UpdatePassword()
     {
         if (BCrypt.Net.BCrypt.Verify(newPassword.AncienPassword, oldUtilisateur.HashMdp))
         {
             oldUtilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(newPassword.NouveauPassword);
             VaporService.UpdateUtilisateur(oldUtilisateur);
             ErrorPassword = true;
+            Snackbar.Add("Mot de passe mise à jour", Severity.Success);
         }
         else
         {
