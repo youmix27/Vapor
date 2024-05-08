@@ -1,16 +1,17 @@
 ﻿@inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager NavManager
+@rendermode InteractiveServer
 
 <MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All">Accueil</MudNavLink>
      <MudNavLink Href="/Catalogue" Match="NavLinkMatch.Prefix">Catalogue</MudNavLink>
     <AuthorizeView Roles="Administrator, User">
         <MudNavGroup Title="@Name" Expanded="true">
-        <MudNavLink Href="/compte" Match="NavLinkMatch.Prefix">Mon Compte</MudNavLink>
-        <MudNavLink Href="/panier" Match="NavLinkMatch.Prefix">Mon Panier</MudNavLink>
-        <MudNavLink Href="/historique_achat" Match="NavLinkMatch.Prefix">Mes Commandes</MudNavLink>
-        <MudNavLink Href="/Account/Logout" Match="NavLinkMatch.Prefix">Se Déconnecter</MudNavLink>
-    </MudNavGroup>
+            <MudNavLink Href="/compte" Match="NavLinkMatch.Prefix">Mon Compte</MudNavLink>
+            <MudNavLink Href="/panier" Match="NavLinkMatch.Prefix">Mon Panier</MudNavLink>
+            <MudNavLink Href="/historique_achat" Match="NavLinkMatch.Prefix">Mes Commandes</MudNavLink>
+            <MudNavLink Href="/Account/Logout" Match="NavLinkMatch.Prefix">Se Déconnecter</MudNavLink>
+        </MudNavGroup>
     </AuthorizeView>
     <AuthorizeView Roles="Administrator">
         <MudNavLink Href="/admin/user" Match="NavLinkMatch.Prefix">Utilisateurs</MudNavLink>

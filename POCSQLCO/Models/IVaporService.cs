@@ -2,25 +2,14 @@
 {
     public interface IVaporService
     {
-
-        IEnumerable<Jeu> FindJeuxByGenre(String genreLibelle);
-        IEnumerable<Jeu> FindJeuxWithUtilisateurAndGenre(Utilisateur utilisateur, String genreLibelle);
-        IEnumerable<Commande> FindAllCommandesTermineByUtilisateur(Utilisateur utilisateur);
-        ContenuCommande FindContenuCommandesByUtilisateurAndJeuAndCommandeNonTerminee(Utilisateur utilisateur, Jeu jeu);
-        IEnumerable<ContenuCommande> FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(Utilisateur utilisateur);
-        ContenuCommande? FindContenuCommandeByUtilisateurAndJeu(int jeuId, int utilisateurId);
-        Commande? FindCommandeNonTermineByUtilisateur(Utilisateur utilisateur);
-        IEnumerable<Jeu> FindJeuxWithUtilisateur(Utilisateur utilisateur);
-        Jeu FindJeuByJaquette(String jaquette);
-        string FindUtilisateurHashPassword(Utilisateur utilisateur);
-        Utilisateur FindUtilisateurByPseudo(string? pseudo);
-
         IEnumerable<Genre> FindAllGenres();
         void InsertGenre(Genre genre);
         void UpdateGenre(Genre genre);
         void DeleteGenre(Genre genre);
         Genre? FindGenreById(int id);
 
+        Commande? FindCommandeNonTermineByUtilisateur(Utilisateur utilisateur);
+        IEnumerable<Commande> FindAllCommandesTermineByUtilisateur(Utilisateur utilisateur);
         IEnumerable<Commande> FindAllCommandes();
         void InsertCommande(Commande commande);
         void UpdateCommande(Commande commande);
@@ -33,6 +22,9 @@
         void DeleteTheme(Theme theme);
         Theme? FindThemeById(int id);
 
+        ContenuCommande? FindContenuCommandeByUtilisateurAndJeu(int jeuId, int utilisateurId);
+        IEnumerable<ContenuCommande> FindAllContenuCommandesByUtilisateurAndCommandeNonTerminee(Utilisateur utilisateur);
+        ContenuCommande FindContenuCommandesByUtilisateurAndJeuAndCommandeNonTerminee(Utilisateur utilisateur, Jeu jeu);
         IEnumerable<ContenuCommande> FindAllContenuCommandes();
         void InsertContenuCommande(ContenuCommande contenuCommande);
         void UpdateContenuCommande(ContenuCommande contenuCommande);
@@ -51,6 +43,10 @@
         void DeleteDistributeur(Distributeur distributeur);
         Distributeur? FindDistributeurById(int id);
 
+        Jeu FindJeuByJaquette(String jaquette);
+        IEnumerable<Jeu> FindJeuxWithUtilisateur(Utilisateur utilisateur);
+        IEnumerable<Jeu> FindJeuxWithUtilisateurAndGenre(Utilisateur utilisateur, String genreLibelle);
+        IEnumerable<Jeu> FindJeuxByGenre(String genreLibelle);
         IEnumerable<Jeu> FindAllJeux();
         void InsertJeu(Jeu jeu);
         void UpdateJeu(Jeu jeu);
@@ -63,6 +59,8 @@
         void DeleteNotation(Notation notation);
         Notation? FindNotationById(int utilisateurId, int jeuId);
 
+        Utilisateur FindUtilisateurByPseudo(string? pseudo);
+        string FindUtilisateurHashPassword(Utilisateur utilisateur);
         IEnumerable<Utilisateur> FindAllUtilisateurs();
         void InsertUtilisateur(Utilisateur utilisateur);
         void UpdateUtilisateur(Utilisateur utilisateur);

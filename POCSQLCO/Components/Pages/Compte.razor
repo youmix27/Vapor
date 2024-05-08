@@ -5,6 +5,7 @@
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using System.Security.Cryptography
+@using POCSQLCO.Models.ViewModels
 @inject Models.IVaporService VaporService
 @inject NavigationManager NavManager
 @inject ISnackbar Snackbar
@@ -35,12 +36,12 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" ButtonType="ButtonType.Submit">Sauvegarder</MudButton>
                 </MudPaper>
             </EditForm>
-            <EditForm Model=@newPassword OnValidSubmit="UpdatePassword">
+            <EditForm Model=@NouveauMotDePasse OnValidSubmit="UpdatePassword">
                 <MudPaper Class="pa-4 mt-4">
                     <MudText Typo="Typo.h5" Align="Align.Center" Class="mb-4"> Modifier Mot de Passe </MudText>
-                    <MudTextField @bind-Value="newPassword.AncienPassword" For="@(() => newPassword.AncienPassword)" InputType="InputType.Password" Label="Ancien Mot de Passe" />
-                    <MudTextField @bind-Value="newPassword.NouveauPassword" For="@(() => newPassword.NouveauPassword)" InputType="InputType.Password" Label="Nouveau Mot de Passe" />
-                    <MudTextField @bind-Value="newPassword.NouveauPassword2" For="@(() => newPassword.NouveauPassword2)" InputType="InputType.Password" Label="Confirmation Nouveau Mot de Passe" />
+                    <MudTextField @bind-Value="NouveauMotDePasse.AncienPassword" For="@(() => NouveauMotDePasse.AncienPassword)" InputType="InputType.Password" Label="Ancien Mot de Passe" />
+                    <MudTextField @bind-Value="NouveauMotDePasse.NouveauPassword" For="@(() => NouveauMotDePasse.NouveauPassword)" InputType="InputType.Password" Label="Nouveau Mot de Passe" />
+                    <MudTextField @bind-Value="NouveauMotDePasse.NouveauPassword2" For="@(() => NouveauMotDePasse.NouveauPassword2)" InputType="InputType.Password" Label="Confirmation Nouveau Mot de Passe" />
                 </MudPaper>
                 <MudPaper Class="pa-4 mt-4">
                     <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPassword">Erreur sur l'ancien mot de passe</MudAlert>
@@ -56,28 +57,12 @@
 @code{
     [CascadingParameter]
     private Task<AuthenticationState> authenticationState { get; set; }
+    [SupplyParameterFromForm]
+    public NouveauMotDePasse NouveauMotDePasse { get; set; } = new NouveauMotDePasse();
 
     public Utilisateur oldUtilisateur { get; set; } = new Utilisateur();
-
-    public NewPassword newPassword { get; set; } = new NewPassword();
-
     public bool ErrorPassword { get; set; } = true;
-
     public bool ErrorPseudo { get; set; } = true;
-
-    public class NewPassword
-    {
-        [Required(ErrorMessage = "Veuillez préciser l'ancien mot de passe")]
-        public string AncienPassword { get; set; }
-
-        [Required(ErrorMessage = "Veuillez préciser le nouveau mot de passe")]
-        [StringLength(30, ErrorMessage = "Le mot de passe doit faire 8 char minimum.", MinimumLength = 8)]
-        public string NouveauPassword { get; set; }
-
-        [Required(ErrorMessage = "Veuillez préciser la confirmation du nouveau mot de passe")]
-        [Compare(nameof(NouveauPassword), ErrorMessage = "les deux mots de passes sont différents")]
-        public string NouveauPassword2 { get; set; }
-    }
 
 
     protected override async void OnInitialized()
@@ -102,9 +87,9 @@
 
     private void UpdatePassword()
     {
-        if (BCrypt.Net.BCrypt.Verify(newPassword.AncienPassword, oldUtilisateur.HashMdp))
+        if (BCrypt.Net.BCrypt.Verify(NouveauMotDePasse.AncienPassword, oldUtilisateur.HashMdp))
         {
-            oldUtilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(newPassword.NouveauPassword);
+            oldUtilisateur.HashMdp = BCrypt.Net.BCrypt.HashPassword(NouveauMotDePasse.NouveauPassword);
             VaporService.UpdateUtilisateur(oldUtilisateur);
             ErrorPassword = true;
             Snackbar.Add("Mot de passe mise à jour", Severity.Success);
