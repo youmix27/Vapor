@@ -129,6 +129,7 @@
         contenuCommande.JeuId = Jeu.Id;
         contenuCommande.Quantite = 1;
         VaporService.InsertContenuCommande(contenuCommande);
+        ExcpetionAchatJeu = "auPanier";
         Snackbar.Add("Jeu ajouté au panier", Severity.Success);
     }
 

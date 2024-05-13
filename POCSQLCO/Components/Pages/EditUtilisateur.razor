@@ -21,8 +21,8 @@
             <MudTextField @bind-Value="oldUtilisateur.CodePostal" For="@(() => oldUtilisateur.CodePostal)" Label="Code Postal" />
             <MudTextField @bind-Value="oldUtilisateur.Adresse" For="@(() => oldUtilisateur.Adresse)" Label="Adresse" />
             <MudTextField @bind-Value="oldUtilisateur.Telephone" For="@(() => oldUtilisateur.Telephone)" Label="Numéro de Téléphone" />
-            <MudCheckBox @bind-Value="oldUtilisateur.FiltreCs" Label="afficher contenu à caractère sexuel"></MudCheckBox>
-            <MudCheckBox @bind-Value="oldUtilisateur.FiltreGore" Label="afficher contenu à caractère gore"></MudCheckBox>
+            <MudCheckBox @bind-Value="oldUtilisateur.FiltreCs" Label="masquer contenu à caractère sexuel"></MudCheckBox>
+            <MudCheckBox @bind-Value="oldUtilisateur.FiltreGore" Label="masquer contenu à caractère gore"></MudCheckBox>
         </DialogContent>
         <DialogActions>
             <MudAlert Class="mb-4" Severity="Severity.Error" hidden="@ErrorPseudo">Nom d'utilisateur déjà utilisé par un autre compte'</MudAlert>

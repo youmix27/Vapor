@@ -30,7 +30,6 @@
 
     private void Delete()
     {
-        //In a real world scenario this bool would probably be a service to delete the item from api/database
         VaporService.DeleteUtilisateur(utilisateur);
         Snackbar.Add("utilisateur supprimé", Severity.Warning);
         MudDialog.Close(DialogResult.Ok(utilisateur.Id));

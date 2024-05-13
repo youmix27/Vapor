@@ -217,7 +217,7 @@ namespace POCSQLCO.Models
         {
             try
             {
-                return _context.Utilisateurs.ToList();
+                return _context.Utilisateurs.Where(u => u.IsAdmin == false).ToList();
             }
             catch
             {
